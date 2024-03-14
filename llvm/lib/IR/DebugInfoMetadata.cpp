@@ -1405,6 +1405,7 @@ unsigned DIExpression::ExprOperand::getSize() const {
   case dwarf::DW_OP_LLVM_convert:
   case dwarf::DW_OP_LLVM_fragment:
   case dwarf::DW_OP_bregx:
+  case dwarf::DW_OP_bit_piece:
     return 3;
   case dwarf::DW_OP_constu:
   case dwarf::DW_OP_consts:
@@ -1436,7 +1437,8 @@ bool DIExpression::isValid() const {
     default:
       return false;
     case dwarf::DW_OP_LLVM_fragment:
-      // A fragment operator must appear at the end.
+    case dwarf::DW_OP_bit_piece:
+      // A fragment or bit piece operator must appear at the end.
       return I->get() + I->getSize() == E->get();
     case dwarf::DW_OP_stack_value: {
       // Must be the last one or followed by a DW_OP_LLVM_fragment.
