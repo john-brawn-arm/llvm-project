@@ -2912,6 +2912,18 @@ public:
     return getFragmentInfo(expr_op_begin(), expr_op_end());
   }
 
+  /// Retrieve the details of this bit piece expression. This returns a
+  /// FragmentInfo but the meaning is different from getFragmentInfo, in that
+  /// a bit piece is a variable which is located in a part of a location and the
+  /// FragmentInfo describes the part of that location.
+  static std::optional<FragmentInfo> getBitPieceInfo(expr_op_iterator Start,
+                                                     expr_op_iterator End);
+
+  /// Retrieve the details of this bit piece expression.
+  std::optional<FragmentInfo> getBitPieceInfo() const {
+    return getBitPieceInfo(expr_op_begin(), expr_op_end());
+  }
+
   /// Return whether this is a piece of an aggregate variable.
   bool isFragment() const { return getFragmentInfo().has_value(); }
 

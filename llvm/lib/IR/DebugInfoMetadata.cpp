@@ -1677,6 +1677,16 @@ DIExpression::getFragmentInfo(expr_op_iterator Start, expr_op_iterator End) {
   return std::nullopt;
 }
 
+std::optional<DIExpression::FragmentInfo>
+DIExpression::getBitPieceInfo(expr_op_iterator Start, expr_op_iterator End) {
+  for (auto I = Start; I != End; ++I)
+    if (I->getOp() == dwarf::DW_OP_bit_piece) {
+      DIExpression::FragmentInfo Info = {I->getArg(0), I->getArg(1)};
+      return Info;
+    }
+  return std::nullopt;
+}
+
 void DIExpression::appendOffset(SmallVectorImpl<uint64_t> &Ops,
                                 int64_t Offset) {
   if (Offset > 0) {
@@ -1929,6 +1939,7 @@ std::optional<DIExpression *> DIExpression::createFragmentExpression(
   // Track whether it's safe to split the value at the top of the DWARF stack,
   // assuming that it'll be used as an implicit location value.
   bool CanSplitValue = true;
+  bool IsBitPiece = false;
   // Copy over the expression, but leave off any trailing DW_OP_LLVM_fragment.
   if (Expr) {
     for (auto Op : Expr->expr_ops()) {
@@ -1965,6 +1976,8 @@ std::optional<DIExpression *> DIExpression::createFragmentExpression(
         break;
       case dwarf::DW_OP_LLVM_fragment: {
         // Make the new offset point into the existing fragment.
+        assert(!IsBitPiece &&
+               "Unexpected DW_OP_LLVM_fragment after DW_OP_bit_piece");
         uint64_t FragmentOffsetInBits = Op.getArg(0);
         uint64_t FragmentSizeInBits = Op.getArg(1);
         (void)FragmentSizeInBits;
@@ -1973,15 +1986,40 @@ std::optional<DIExpression *> DIExpression::createFragmentExpression(
         OffsetInBits += FragmentOffsetInBits;
         continue;
       }
+      case dwarf::DW_OP_bit_piece: {
+        uint64_t BitPieceOffsetInBits = Op.getArg(1);
+        uint64_t BitPieceSizeInBits = Op.getArg(0);
+        // BitPieceOffsetInBits is the offset inside the value at which the
+        // variable can be found, which is opposite to OffsetInBits which is
+        // the offset inside the variable which this value represents. Therefore
+        // we subtract instead of adding, and give up if this would result in
+        // a negative offset.
+        if (OffsetInBits > BitPieceOffsetInBits)
+          return std::nullopt;
+        OffsetInBits = BitPieceOffsetInBits - OffsetInBits;
+        // Give up if this bit piece doesn't fully fit within the fragment.
+        if (OffsetInBits + BitPieceSizeInBits > SizeInBits)
+          return std::nullopt;
+        SizeInBits = BitPieceSizeInBits;
+        // We need to emit DW_OP_bit_piece at the end.
+        IsBitPiece = true;
+        continue;
+      }
       }
       Op.appendToVector(Ops);
     }
   }
   assert((!Expr->isImplicit() || CanSplitValue) && "Expr can't be split");
   assert(Expr && "Unknown DIExpression");
-  Ops.push_back(dwarf::DW_OP_LLVM_fragment);
-  Ops.push_back(OffsetInBits);
-  Ops.push_back(SizeInBits);
+  if (IsBitPiece) {
+    Ops.push_back(dwarf::DW_OP_bit_piece);
+    Ops.push_back(SizeInBits);
+    Ops.push_back(OffsetInBits);
+  } else {
+    Ops.push_back(dwarf::DW_OP_LLVM_fragment);
+    Ops.push_back(OffsetInBits);
+    Ops.push_back(SizeInBits);
+  }
   return DIExpression::get(Expr->getContext(), Ops);
 }
 

@@ -640,6 +640,12 @@ private:
   void verifyFragmentExpression(const DIVariable &V,
                                 DIExpression::FragmentInfo Fragment,
                                 ValueOrMetadata *Desc);
+  void verifyBitPieceExpression(const DbgVariableIntrinsic &I);
+  void verifyBitPieceExpression(const DbgVariableRecord &I);
+  template <typename ValueOrMetadata>
+  void verifyBitPieceExpression(const DIVariable &V,
+                                DIExpression::FragmentInfo BitPiece,
+                                uint64_t ValueSize, ValueOrMetadata *Desc);
   void verifyFnArgs(const DbgVariableIntrinsic &I);
   void verifyFnArgs(const DbgVariableRecord &DVR);
   void verifyNotEntryValue(const DbgVariableIntrinsic &I);
@@ -698,6 +704,7 @@ void Verifier::visitDbgRecords(Instruction &I) {
       // These have to appear after `visit` for consistency with existing
       // intrinsic behaviour.
       verifyFragmentExpression(*DVR);
+      verifyBitPieceExpression(*DVR);
       verifyNotEntryValue(*DVR);
     } else if (auto *DLR = dyn_cast<DbgLabelRecord>(&DR)) {
       visit(*DLR);
@@ -1666,6 +1673,10 @@ void Verifier::visitDIGlobalVariableExpression(
     visitDIExpression(*Expr);
     if (auto Fragment = Expr->getFragmentInfo())
       verifyFragmentExpression(*GVE.getVariable(), *Fragment, &GVE);
+    if (auto BitPiece = Expr->getBitPieceInfo())
+      verifyBitPieceExpression(*GVE.getVariable(), *BitPiece,
+                               GVE.getVariable()->getSizeInBits().value_or(0),
+                               &GVE);
   }
 }
 
@@ -5196,6 +5207,7 @@ void Verifier::visitInstruction(Instruction &I) {
 
   if (auto *DII = dyn_cast<DbgVariableIntrinsic>(&I)) {
     verifyFragmentExpression(*DII);
+    verifyBitPieceExpression(*DII);
     verifyNotEntryValue(*DII);
   }
 
@@ -6819,6 +6831,74 @@ void Verifier::verifyFragmentExpression(const DIVariable &V,
   CheckDI(FragSize + FragOffset <= *VarSize,
           "fragment is larger than or outside of variable", Desc, &V);
   CheckDI(FragSize != *VarSize, "fragment covers entire variable", Desc, &V);
+}
+
+void Verifier::verifyBitPieceExpression(const DbgVariableIntrinsic &I) {
+  DILocalVariable *V = dyn_cast_or_null<DILocalVariable>(I.getRawVariable());
+  DIExpression *E = dyn_cast_or_null<DIExpression>(I.getRawExpression());
+
+  // We don't know whether this intrinsic verified correctly.
+  if (!V || !E || !E->isValid())
+    return;
+
+  // Nothing to do if this isn't a DW_OP_bit_piece expression.
+  auto BitPiece = E->getBitPieceInfo();
+  if (!BitPiece)
+    return;
+
+  uint64_t ValueSize = 0;
+  if (auto *DVI = dyn_cast<DbgValueInst>(&I)) {
+    ValueSize = DVI->getValue(0)->getType()->getScalarSizeInBits();
+  } else if (auto *DDI = dyn_cast<DbgDeclareInst>(&I)) {
+    bool CanBeNull, CanBeFreed;
+    ValueSize = DDI->getAddress()->getPointerDereferenceableBytes(DL, CanBeNull,
+                                                                  CanBeFreed) *
+                8;
+  }
+
+  verifyBitPieceExpression(*V, *BitPiece, ValueSize, &I);
+}
+
+void Verifier::verifyBitPieceExpression(const DbgVariableRecord &DVR) {
+  DILocalVariable *V = dyn_cast_or_null<DILocalVariable>(DVR.getRawVariable());
+  DIExpression *E = dyn_cast_or_null<DIExpression>(DVR.getRawExpression());
+
+  // We don't know whether this intrinsic verified correctly.
+  if (!V || !E || !E->isValid())
+    return;
+
+  // Nothing to do if this isn't a DW_OP_bit_piece expression.
+  auto BitPiece = E->getBitPieceInfo();
+  if (!BitPiece)
+    return;
+
+  uint64_t ValueSize = 0;
+  if (DVR.isAddressOfVariable()) {
+    bool CanBeNull, CanBeFreed;
+    ValueSize = DVR.getAddress()->getPointerDereferenceableBytes(DL, CanBeNull,
+                                                                 CanBeFreed) *
+                8;
+  } else {
+    ValueSize = DVR.getValue(0)->getType()->getScalarSizeInBits();
+  }
+
+  verifyBitPieceExpression(*V, *BitPiece, ValueSize, &DVR);
+}
+
+template <typename ValueOrMetadata>
+void Verifier::verifyBitPieceExpression(const DIVariable &V,
+                                        DIExpression::FragmentInfo BitPiece,
+                                        uint64_t ValueSize,
+                                        ValueOrMetadata *Desc) {
+  unsigned PieceSize = BitPiece.SizeInBits;
+  unsigned PieceOffset = BitPiece.OffsetInBits;
+  auto VarSize = V.getSizeInBits();
+  if (VarSize)
+    CheckDI(PieceSize <= *VarSize, "bit piece is larger than variable", Desc,
+            &V);
+  if (ValueSize)
+    CheckDI(PieceSize + PieceOffset <= ValueSize,
+            "bit piece extends outside of value", Desc, &V);
 }
 
 void Verifier::verifyFnArgs(const DbgVariableIntrinsic &I) {
