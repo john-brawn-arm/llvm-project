@@ -1,12 +1,12 @@
 ; REQUIRES: asserts
-; RUN: opt < %s -passes=loop-vectorize -force-vector-width=2 -force-vector-interleave=1 -force-widen-divrem-via-safe-divisor=0 -disable-output -debug-only=loop-vectorize 2>&1 | FileCheck %s
+; RUN: opt < %s -passes=loop-vectorize -force-vector-width=2 -force-vector-interleave=1 -force-widen-divrem-via-safe-divisor=0 -prefer-predicate-over-epilogue=predicate-dont-vectorize -disable-output -debug-only=loop-vectorize 2>&1 | FileCheck %s
 
 target datalayout = "e-m:e-i64:64-i128:128-n32:64-S128"
 
 ; Test cases for PR50009, which require sinking a replicate-region due to a
 ; first-order recurrence.
 
-define void @sink_replicate_region_1(i32 %x, ptr %ptr, ptr noalias %dst) optsize {
+define void @sink_replicate_region_1(i32 %x, ptr %ptr, ptr noalias %dst) {
 ; CHECK-LABEL: sink_replicate_region_1
 ; CHECK:      VPlan 'Initial VPlan for VF={2},UF>=1' {
 ; CHECK-NEXT: Live-in vp<[[VF:%.+]]> = VF
@@ -112,7 +112,7 @@ exit:
   ret void
 }
 
-define void @sink_replicate_region_2(i32 %x, i8 %y, ptr %ptr) optsize {
+define void @sink_replicate_region_2(i32 %x, i8 %y, ptr %ptr) {
 ; CHECK-LABEL: sink_replicate_region_2
 ; CHECK:      VPlan 'Initial VPlan for VF={2},UF>=1' {
 ; CHECK-NEXT: Live-in vp<[[VF:%.+]]> = VF
@@ -197,7 +197,7 @@ exit:
   ret void
 }
 
-define i32 @sink_replicate_region_3_reduction(i32 %x, i8 %y, ptr %ptr) optsize {
+define i32 @sink_replicate_region_3_reduction(i32 %x, i8 %y, ptr %ptr) {
 ; CHECK-LABEL: sink_replicate_region_3_reduction
 ; CHECK:      VPlan 'Initial VPlan for VF={2},UF>=1' {
 ; CHECK-NEXT: Live-in vp<[[VFxUF:%.+]]> = VF * UF
@@ -273,7 +273,7 @@ exit:
 
 ; To sink the replicate region containing %rem, we need to split the block
 ; containing %conv at the end, because %conv is the last recipe in the block.
-define void @sink_replicate_region_4_requires_split_at_end_of_block(i32 %x, ptr %ptr, ptr noalias %dst) optsize {
+define void @sink_replicate_region_4_requires_split_at_end_of_block(i32 %x, ptr %ptr, ptr noalias %dst) {
 ; CHECK-LABEL: sink_replicate_region_4_requires_split_at_end_of_block
 ; CHECK:      VPlan 'Initial VPlan for VF={2},UF>=1' {
 ; CHECK-NEXT: Live-in vp<[[VF:%.+]]> = VF
@@ -386,7 +386,7 @@ exit:
 }
 
 ; Test case that requires sinking a recipe in a replicate region after another replicate region.
-define void @sink_replicate_region_after_replicate_region(ptr %ptr, ptr noalias %dst.2, i32 %x, i8 %y) optsize {
+define void @sink_replicate_region_after_replicate_region(ptr %ptr, ptr noalias %dst.2, i32 %x, i8 %y) {
 ; CHECK-LABEL: sink_replicate_region_after_replicate_region
 ; CHECK:      VPlan 'Initial VPlan for VF={2},UF>=1' {
 ; CHECK-NEXT: Live-in vp<[[VF:%.+]]> = VF

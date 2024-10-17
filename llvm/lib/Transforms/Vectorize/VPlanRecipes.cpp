@@ -924,7 +924,7 @@ void VPWidenCallRecipe::execute(VPTransformState &State) {
 
 InstructionCost VPWidenCallRecipe::computeCost(ElementCount VF,
                                                VPCostContext &Ctx) const {
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
   return Ctx.TTI.getCallInstrCost(nullptr, Variant->getReturnType(),
                                   Variant->getFunctionType()->params(),
                                   CostKind);
@@ -1004,7 +1004,7 @@ void VPWidenIntrinsicRecipe::execute(VPTransformState &State) {
 
 InstructionCost VPWidenIntrinsicRecipe::computeCost(ElementCount VF,
                                                     VPCostContext &Ctx) const {
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
 
   // Some backends analyze intrinsic arguments to determine cost. Use the
   // underlying value for the operand if it has one. Otherwise try to use the
@@ -1144,8 +1144,7 @@ InstructionCost VPHistogramRecipe::computeCost(ElementCount VF,
                               {PtrTy, IncTy, MaskTy});
 
   // Add the costs together with the add/sub operation.
-  return Ctx.TTI.getIntrinsicInstrCost(
-             ICA, TargetTransformInfo::TCK_RecipThroughput) +
+  return Ctx.TTI.getIntrinsicInstrCost(ICA, Ctx.CostKind) +
          MulCost + Ctx.TTI.getArithmeticInstrCost(Opcode, VTy);
 }
 
@@ -1207,7 +1206,7 @@ InstructionCost VPWidenSelectRecipe::computeCost(ElementCount VF,
   bool ScalarCond = getOperand(0)->isDefinedOutsideLoopRegions();
   Type *ScalarTy = Ctx.Types.inferScalarType(this);
   Type *VectorTy = ToVectorTy(Ctx.Types.inferScalarType(this), VF);
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
 
   VPValue *Op0, *Op1;
   using namespace llvm::VPlanPatternMatch;
@@ -1380,7 +1379,7 @@ void VPWidenRecipe::execute(VPTransformState &State) {
 
 InstructionCost VPWidenRecipe::computeCost(ElementCount VF,
                                            VPCostContext &Ctx) const {
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
   switch (Opcode) {
   case Instruction::FNeg: {
     Type *VectorTy = ToVectorTy(Ctx.Types.inferScalarType(this), VF);
@@ -1572,7 +1571,7 @@ InstructionCost VPWidenCastRecipe::computeCost(ElementCount VF,
   auto *DestTy = cast<VectorType>(ToVectorTy(getResultType(), VF));
   // Arm TTI will use the underlying instruction to determine the cost.
   return Ctx.TTI.getCastInstrCost(
-      Opcode, DestTy, SrcTy, CCH, TTI::TCK_RecipThroughput,
+      Opcode, DestTy, SrcTy, CCH, Ctx.CostKind,
       dyn_cast_if_present<Instruction>(getUnderlyingValue()));
 }
 
@@ -1590,7 +1589,7 @@ void VPWidenCastRecipe::print(raw_ostream &O, const Twine &Indent,
 
 InstructionCost VPHeaderPHIRecipe::computeCost(ElementCount VF,
                                                VPCostContext &Ctx) const {
-  return Ctx.TTI.getCFInstrCost(Instruction::PHI, TTI::TCK_RecipThroughput);
+  return Ctx.TTI.getCFInstrCost(Instruction::PHI, Ctx.CostKind);
 }
 
 /// This function adds
@@ -2081,7 +2080,7 @@ void VPBlendRecipe::execute(VPTransformState &State) {
 
 InstructionCost VPBlendRecipe::computeCost(ElementCount VF,
                                            VPCostContext &Ctx) const {
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
 
   // Handle cases where only the first lane is used the same way as the legacy
   // cost model.
@@ -2211,7 +2210,7 @@ InstructionCost VPReductionRecipe::computeCost(ElementCount VF,
   RecurKind RdxKind = RdxDesc.getRecurrenceKind();
   Type *ElementTy = Ctx.Types.inferScalarType(this);
   auto *VectorTy = cast<VectorType>(ToVectorTy(ElementTy, VF));
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
   unsigned Opcode = RdxDesc.getOpcode();
 
   // TODO: Support any-of and in-loop reductions.
@@ -2466,7 +2465,7 @@ InstructionCost VPWidenMemoryRecipe::computeCost(ElementCount VF,
       getLoadStoreAlignment(const_cast<Instruction *>(&Ingredient));
   unsigned AS =
       getLoadStoreAddressSpace(const_cast<Instruction *>(&Ingredient));
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
 
   if (!Consecutive) {
     // TODO: Using the original IR may not be accurate.
@@ -2613,7 +2612,7 @@ InstructionCost VPWidenLoadEVLRecipe::computeCost(ElementCount VF,
       getLoadStoreAlignment(const_cast<Instruction *>(&Ingredient));
   unsigned AS =
       getLoadStoreAddressSpace(const_cast<Instruction *>(&Ingredient));
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
   InstructionCost Cost = Ctx.TTI.getMaskedMemoryOpCost(
       Ingredient.getOpcode(), Ty, Alignment, AS, CostKind);
   if (!Reverse)
@@ -2734,7 +2733,7 @@ InstructionCost VPWidenStoreEVLRecipe::computeCost(ElementCount VF,
       getLoadStoreAlignment(const_cast<Instruction *>(&Ingredient));
   unsigned AS =
       getLoadStoreAddressSpace(const_cast<Instruction *>(&Ingredient));
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
   InstructionCost Cost = Ctx.TTI.getMaskedMemoryOpCost(
       Ingredient.getOpcode(), Ty, Alignment, AS, CostKind);
   if (!Reverse)
@@ -3099,7 +3098,7 @@ InstructionCost VPInterleaveRecipe::computeCost(ElementCount VF,
                                 : getStoredValues()[InsertPosIdx]);
   auto *VectorTy = cast<VectorType>(ToVectorTy(ValTy, VF));
   unsigned AS = getLoadStoreAddressSpace(InsertPos);
-  enum TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  enum TTI::TargetCostKind CostKind = Ctx.CostKind;
 
   unsigned InterleaveFactor = IG->getFactor();
   auto *WideVecTy = VectorType::get(ValTy, VF * InterleaveFactor);
@@ -3336,7 +3335,7 @@ void VPFirstOrderRecurrencePHIRecipe::execute(VPTransformState &State) {
 InstructionCost
 VPFirstOrderRecurrencePHIRecipe::computeCost(ElementCount VF,
                                              VPCostContext &Ctx) const {
-  TTI::TargetCostKind CostKind = TTI::TCK_RecipThroughput;
+  TTI::TargetCostKind CostKind = Ctx.CostKind;
   if (VF.isScalar())
   return Ctx.TTI.getCFInstrCost(Instruction::PHI, CostKind);
 
