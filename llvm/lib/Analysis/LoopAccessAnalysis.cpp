@@ -528,8 +528,10 @@ void RuntimePointerChecking::groupChecks(
     // equivalence class, the iteration order is deterministic.
     for (auto M : DepCands.members(Access)) {
       auto PointerI = PositionMap.find(M.getPointer());
-      assert(PointerI != PositionMap.end() &&
-             "pointer in equivalence class not found in PositionMap");
+      // If we can't find the pointer in PositionMap that means we can't
+      // generate a memcheck for it.
+      if (PointerI == PositionMap.end())
+        continue;
       for (unsigned Pointer : PointerI->second) {
         bool Merged = false;
         // Mark this pointer as seen.
@@ -1273,7 +1275,6 @@ bool AccessAnalysis::canCheckPtrAtRT(
                                   /*Assume=*/true)) {
           CanDoAliasSetRT = false;
           UncomputablePtr = Access.getPointer();
-          break;
         }
       }
     }
@@ -1313,7 +1314,7 @@ bool AccessAnalysis::canCheckPtrAtRT(
     }
   }
 
-  if (MayNeedRTCheck && CanDoRT)
+  if (MayNeedRTCheck)
     RtCheck.generateChecks(DepCands, IsDepCheckNeeded);
 
   LLVM_DEBUG(dbgs() << "LAA: We need to do " << RtCheck.getNumberOfChecks()
@@ -1323,11 +1324,7 @@ bool AccessAnalysis::canCheckPtrAtRT(
   // are needed. This can happen when all pointers point to the same underlying
   // object for example.
   RtCheck.Need = CanDoRT ? RtCheck.getNumberOfChecks() != 0 : MayNeedRTCheck;
-
-  bool CanDoRTIfNeeded = !RtCheck.Need || CanDoRT;
-  if (!CanDoRTIfNeeded)
-    RtCheck.reset();
-  return CanDoRTIfNeeded;
+  return !RtCheck.Need || CanDoRT;
 }
 
 void AccessAnalysis::processMemAccesses() {
