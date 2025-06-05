@@ -290,7 +290,7 @@ static cl::opt<bool> EnableSampledInstr(
     "enable-sampled-instrumentation", cl::init(false), cl::Hidden,
     cl::desc("Enable profile instrumentation sampling (default = off)"));
 static cl::opt<bool> UseLoopVersioningLICM(
-    "enable-loop-versioning-licm", cl::init(false), cl::Hidden,
+    "enable-loop-versioning-licm", cl::init(true), cl::Hidden,
     cl::desc("Enable the experimental Loop Versioning LICM pass"));
 
 static cl::opt<std::string> InstrumentColdFuncOnlyPath(
