@@ -5425,7 +5425,7 @@ void LSRInstance::NarrowSearchSpaceByPickingWinnerRegs() {
 /// scenarios.
 void LSRInstance::NarrowSearchSpaceUsingHeuristics() {
   NarrowSearchSpaceByDetectingSupersets();
-  NarrowSearchSpaceByCollapsingUnrolledCode();
+  //NarrowSearchSpaceByCollapsingUnrolledCode();
   NarrowSearchSpaceByRefilteringUndesirableDedicatedRegisters();
   if (FilterSameScaledReg)
     NarrowSearchSpaceByFilterFormulaWithSameScaledReg();
