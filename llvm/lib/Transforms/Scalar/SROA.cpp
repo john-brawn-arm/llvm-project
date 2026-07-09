@@ -4805,6 +4805,43 @@ static Type *getTypePartition(const DataLayout &DL, Type *Ty, uint64_t Offset,
   return SubTy;
 }
 
+/// Try to find a slice in P that overlaps with S, and which forms a load/store
+/// pair with S (i.e. the two slices are used to perform a memmove-like copy
+/// within P).
+static Slice *findOverlappingCopySlice(Slice &S, Partition &P) {
+  // Single byte slices can't overlap anything
+  if (S.endOffset() - S.beginOffset() == 1)
+    return nullptr;
+  // The source/destination of this slice needs to be a memory instruction
+  // whose slice overlaps this one.
+  Instruction *I = cast<Instruction>(S.getUse()->getUser());
+  Instruction *J = nullptr;
+  if (auto *LI = dyn_cast<LoadInst>(I)) {
+    if (!LI->hasOneUser())
+      return nullptr;
+    J = dyn_cast<Instruction>(*LI->user_begin());
+    if (!J)
+      return nullptr;
+  } else if (auto *SI = dyn_cast<StoreInst>(I)) {
+    J = dyn_cast<Instruction>(SI->getValueOperand());
+    if (!J || !J->hasOneUser())
+      return nullptr;
+  } else {
+    return nullptr;
+  }
+  // Check if there's a slice that corresponds to J that overlaps this slice
+  for (Slice &JS : P) {
+    if (JS.getUse()->getUser() != J)
+      continue;
+    if (S.beginOffset() > JS.beginOffset() && S.beginOffset() < JS.endOffset())
+      return &JS;
+    if (JS.beginOffset() > S.beginOffset() && JS.beginOffset() < S.endOffset())
+      return &JS;
+    return nullptr;
+  }
+  return nullptr;
+}
+
 /// Pre-split loads and stores to simplify rewriting.
 ///
 /// We want to break up the splittable load+store pairs as much as
@@ -4867,7 +4904,9 @@ bool SROA::presplitLoadsAndStores(AllocaInst &AI, AllocaSlices &AS) {
   for (auto &P : AS.partitions()) {
     for (Slice &S : P) {
       Instruction *I = cast<Instruction>(S.getUse()->getUser());
-      if (!S.isSplittable() || S.endOffset() <= P.endOffset()) {
+      bool ExtendsPastPartitionEnd = S.endOffset() > P.endOffset();
+      Slice *CopyOverlap = findOverlappingCopySlice(S, P);
+      if (!S.isSplittable() || !(ExtendsPastPartitionEnd || CopyOverlap)) {
         // If this is a load we have to track that it can't participate in any
         // pre-splitting. If this is a store of a load we have to track that
         // that load also can't participate in any pre-splitting.
@@ -4923,7 +4962,37 @@ bool SROA::presplitLoadsAndStores(AllocaInst &AI, AllocaSlices &AS) {
       assert(Offsets.Splits.empty() &&
              "Should not have splits the first time we see an instruction!");
       Offsets.S = &S;
-      Offsets.Splits.push_back(P.endOffset() - S.beginOffset());
+      if (CopyOverlap) {
+        // S is being moved to CopyOverlap, which overlaps with S, so we split S
+        // into three part, which:
+        //  * Starts outside the overlap and is copied into the overlap
+        //  * Either starts inside the overlap and is copied inside the overlap,
+        //    or starts outside and is copied outside, depending on if the
+        //    overlap or non-overlap area is larger, and which will be empty if
+        //    they are equal.
+        //  * Starts inside the overlap and is copied outside the overlap
+        // This should result in the first and last parts being promoted to
+        // scalars, which may result in the middle part now being an overlapping
+        // copy which will then be presplit in the same way in the next
+        // iteration of the SROA loop.
+        uint64_t OverlapStart =
+            std::max(S.beginOffset(), CopyOverlap->beginOffset());
+        uint64_t OverlapEnd = std::min(S.endOffset(), CopyOverlap->endOffset());
+        uint64_t OverlapSize = OverlapEnd - OverlapStart;
+        uint64_t NonOverlapSize =
+            (S.endOffset() - S.beginOffset()) - OverlapSize;
+        if (OverlapSize < NonOverlapSize) {
+          Offsets.Splits.push_back(OverlapSize);
+          Offsets.Splits.push_back(NonOverlapSize);
+        } else if (OverlapSize > NonOverlapSize) {
+          Offsets.Splits.push_back(NonOverlapSize);
+          Offsets.Splits.push_back(OverlapSize);
+        } else {
+          Offsets.Splits.push_back(OverlapSize);
+        }
+      } else {
+        Offsets.Splits.push_back(P.endOffset() - S.beginOffset());
+      }
     }
 
     // Now scan the already split slices, and add a split for any of them which
