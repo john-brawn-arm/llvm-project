@@ -2988,6 +2988,14 @@ let Predicates = [HasSVE_or_SME] in {
                 (EXTRACT_SUBREG (DECB_XPiI (INSERT_SUBREG (IMPLICIT_DEF),
                                             GPR32:$op, sub_32), 31, imm),
                                  sub_32)>;
+
+      def : Pat<(sub GPR64:$op, (vscale !mul(imm, 16))),
+                (DECB_XPiI GPR64:$op, 31, imm)>;
+
+      def : Pat<(sub GPR32:$op, (i32 (trunc (vscale !mul(imm, 16))))),
+                (EXTRACT_SUBREG (DECB_XPiI (INSERT_SUBREG (IMPLICIT_DEF),
+                                            GPR32:$op, sub_32), 31, imm),
+                                 sub_32)>;
       }
   }
 
@@ -3000,45 +3008,36 @@ let Predicates = [HasSVE_or_SME] in {
                                         GPR32:$op, sub_32), $imm),
                               sub_32)>;
 
-    def : Pat<(add GPR64:$op, (vscale (sve_cnth_imm i32:$imm))),
-              (INCH_XPiI GPR64:$op, 31, $imm)>;
-    def : Pat<(add GPR64:$op, (vscale (sve_cntw_imm i32:$imm))),
-              (INCW_XPiI GPR64:$op, 31, $imm)>;
-    def : Pat<(add GPR64:$op, (vscale (sve_cntd_imm i32:$imm))),
-              (INCD_XPiI GPR64:$op, 31, $imm)>;
+    multiclass incDecPat<Instruction inc, Instruction dec,
+                         ComplexPattern imm_pat, ComplexPattern imm_pat_neg> {
+      def : Pat<(add GPR64:$op, (vscale (imm_pat i32:$imm))),
+                (inc GPR64:$op, 31, $imm)>;
 
-    def : Pat<(add GPR64:$op, (vscale (sve_cnth_imm_neg i32:$imm))),
-              (DECH_XPiI GPR64:$op, 31, $imm)>;
-    def : Pat<(add GPR64:$op, (vscale (sve_cntw_imm_neg i32:$imm))),
-              (DECW_XPiI GPR64:$op, 31, $imm)>;
-    def : Pat<(add GPR64:$op, (vscale (sve_cntd_imm_neg i32:$imm))),
-              (DECD_XPiI GPR64:$op, 31, $imm)>;
+      def : Pat<(add GPR64:$op, (vscale (imm_pat_neg i32:$imm))),
+                (dec GPR64:$op, 31, $imm)>;
 
-    def : Pat<(add GPR32:$op, (i32 (trunc (vscale (sve_cnth_imm i32:$imm))))),
-              (EXTRACT_SUBREG (INCH_XPiI (INSERT_SUBREG (IMPLICIT_DEF),
-                                          GPR32:$op, sub_32), 31, $imm),
-                               sub_32)>;
-    def : Pat<(add GPR32:$op, (i32 (trunc (vscale (sve_cntw_imm i32:$imm))))),
-              (EXTRACT_SUBREG (INCW_XPiI (INSERT_SUBREG (IMPLICIT_DEF),
-                                          GPR32:$op, sub_32), 31, $imm),
-                               sub_32)>;
-    def : Pat<(add GPR32:$op, (i32 (trunc (vscale (sve_cntd_imm i32:$imm))))),
-              (EXTRACT_SUBREG (INCD_XPiI (INSERT_SUBREG (IMPLICIT_DEF),
-                                          GPR32:$op, sub_32), 31, $imm),
-                               sub_32)>;
+      def : Pat<(sub GPR64:$op, (vscale (imm_pat i32:$imm))),
+                (dec GPR64:$op, 31, $imm)>;
 
-    def : Pat<(add GPR32:$op, (i32 (trunc (vscale (sve_cnth_imm_neg i32:$imm))))),
-              (EXTRACT_SUBREG (DECH_XPiI (INSERT_SUBREG (IMPLICIT_DEF),
-                                          GPR32:$op, sub_32), 31, $imm),
-                               sub_32)>;
-    def : Pat<(add GPR32:$op, (i32 (trunc (vscale (sve_cntw_imm_neg i32:$imm))))),
-              (EXTRACT_SUBREG (DECW_XPiI (INSERT_SUBREG (IMPLICIT_DEF),
-                                          GPR32:$op, sub_32), 31, $imm),
-                               sub_32)>;
-    def : Pat<(add GPR32:$op, (i32 (trunc (vscale (sve_cntd_imm_neg i32:$imm))))),
-              (EXTRACT_SUBREG (DECD_XPiI (INSERT_SUBREG (IMPLICIT_DEF),
-                                          GPR32:$op, sub_32), 31, $imm),
-                               sub_32)>;
+      def : Pat<(add GPR32:$op, (i32 (trunc (vscale (imm_pat i32:$imm))))),
+                (EXTRACT_SUBREG (inc (INSERT_SUBREG (IMPLICIT_DEF),
+                                      GPR32:$op, sub_32), 31, $imm),
+                                 sub_32)>;
+
+      def : Pat<(add GPR32:$op, (i32 (trunc (vscale (imm_pat_neg i32:$imm))))),
+                (EXTRACT_SUBREG (dec (INSERT_SUBREG (IMPLICIT_DEF),
+                                      GPR32:$op, sub_32), 31, $imm),
+                                 sub_32)>;
+
+      def : Pat<(sub GPR32:$op, (i32 (trunc (vscale (imm_pat i32:$imm))))),
+                (EXTRACT_SUBREG (dec (INSERT_SUBREG (IMPLICIT_DEF),
+                                      GPR32:$op, sub_32), 31, $imm),
+                                 sub_32)>;
+    }
+
+    defm : incDecPat<INCH_XPiI, DECH_XPiI, sve_cnth_imm, sve_cnth_imm_neg>;
+    defm : incDecPat<INCW_XPiI, DECW_XPiI, sve_cntw_imm, sve_cntw_imm_neg>;
+    defm : incDecPat<INCD_XPiI, DECD_XPiI, sve_cntd_imm, sve_cntd_imm_neg>;
   }
 
   // For big endian, only BITCASTs involving same sized vector types with same
