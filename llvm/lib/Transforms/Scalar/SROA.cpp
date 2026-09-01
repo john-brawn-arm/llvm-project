@@ -129,6 +129,7 @@ namespace {
 class AllocaSliceRewriter;
 class AllocaSlices;
 class Partition;
+class Slice;
 
 class SelectHandSpeculativity {
   unsigned char Storage = 0; // None are speculatable by default.
@@ -153,6 +154,8 @@ using UnspeculatableStore = StoreInst *;
 using RewriteableMemOp =
     std::variant<PossiblySpeculatableLoad, UnspeculatableStore>;
 using RewriteableMemOps = SmallVector<RewriteableMemOp, 2>;
+using InstructionSliceMap =
+    SmallDenseMap<Instruction *, SmallPtrSet<Slice *, 8>, 8>;
 
 /// An optimization pass providing Scalar Replacement of Aggregates.
 ///
@@ -4808,7 +4811,8 @@ static Type *getTypePartition(const DataLayout &DL, Type *Ty, uint64_t Offset,
 /// Try to find a slice in P that overlaps with S, and which forms a load/store
 /// pair with S (i.e. the two slices are used to perform a memmove-like copy
 /// within P).
-static Slice *findOverlappingCopySlice(Slice &S, Partition &P) {
+static Slice *findOverlappingCopySlice(Slice &S, Partition &P,
+                                       InstructionSliceMap &SliceMap) {
   // Single byte slices can't overlap anything
   if (S.endOffset() - S.beginOffset() == 1)
     return nullptr;
@@ -4830,14 +4834,13 @@ static Slice *findOverlappingCopySlice(Slice &S, Partition &P) {
     return nullptr;
   }
   // Check if there's a slice that corresponds to J that overlaps this slice
-  for (Slice &JS : P) {
-    if (JS.getUse()->getUser() != J)
-      continue;
-    if (S.beginOffset() > JS.beginOffset() && S.beginOffset() < JS.endOffset())
-      return &JS;
-    if (JS.beginOffset() > S.beginOffset() && JS.beginOffset() < S.endOffset())
-      return &JS;
-    return nullptr;
+  for (Slice *JS : SliceMap[J]) {
+    if (S.beginOffset() > JS->beginOffset() &&
+        S.beginOffset() < JS->endOffset())
+      return JS;
+    if (JS->beginOffset() > S.beginOffset() &&
+        JS->beginOffset() < S.endOffset())
+      return JS;
   }
   return nullptr;
 }
@@ -4902,10 +4905,14 @@ bool SROA::presplitLoadsAndStores(AllocaInst &AI, AllocaSlices &AS) {
 
   LLVM_DEBUG(dbgs() << "  Searching for candidate loads and stores\n");
   for (auto &P : AS.partitions()) {
+    InstructionSliceMap SliceMap;
+    for (Slice &S : P) {
+      SliceMap[cast<Instruction>(S.getUse()->getUser())].insert(&S);
+    }
     for (Slice &S : P) {
       Instruction *I = cast<Instruction>(S.getUse()->getUser());
       bool ExtendsPastPartitionEnd = S.endOffset() > P.endOffset();
-      Slice *CopyOverlap = findOverlappingCopySlice(S, P);
+      Slice *CopyOverlap = findOverlappingCopySlice(S, P, SliceMap);
       if (!S.isSplittable() || !(ExtendsPastPartitionEnd || CopyOverlap)) {
         // If this is a load we have to track that it can't participate in any
         // pre-splitting. If this is a store of a load we have to track that
