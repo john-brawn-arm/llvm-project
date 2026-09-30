@@ -308,6 +308,11 @@ public:
     return false;
   }
 
+  TTI::AddressingModeKind
+  getPreferredAddressingMode(const Loop *L, ScalarEvolution *SE) const override {
+    return TTI::AMK_All;
+  }
+
   bool isLegalMaskedLoadStore(Type *DataType, Align Alignment) const {
     if (!ST->isSVEorStreamingSVEAvailable())
       return false;

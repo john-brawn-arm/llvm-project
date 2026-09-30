@@ -324,14 +324,13 @@ define i64 @mvn_ror_i64(i64 %0) {
 define void @array_and_not_i8(ptr %a, i8 %m) {
 ; CHECK-LABEL: array_and_not_i8:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB26_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldrb w9, [x0, x8]
+; CHECK-NEXT:    ldrb w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    bic w9, w9, w1
-; CHECK-NEXT:    strb w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #1
-; CHECK-NEXT:    cmp x8, #16
+; CHECK-NEXT:    strb w9, [x0], #1
 ; CHECK-NEXT:    b.ne .LBB26_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -356,14 +355,13 @@ for.body:
 define void @array_and_not_i16(ptr %a, i16 %m) {
 ; CHECK-LABEL: array_and_not_i16:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB27_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldrh w9, [x0, x8]
+; CHECK-NEXT:    ldrh w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    bic w9, w9, w1
-; CHECK-NEXT:    strh w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #2
-; CHECK-NEXT:    cmp x8, #32
+; CHECK-NEXT:    strh w9, [x0], #2
 ; CHECK-NEXT:    b.ne .LBB27_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -388,14 +386,13 @@ for.body:
 define void @array_and_not_i32(ptr %a, i32 %m) {
 ; CHECK-LABEL: array_and_not_i32:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB28_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr w9, [x0, x8]
+; CHECK-NEXT:    ldr w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    bic w9, w9, w1
-; CHECK-NEXT:    str w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #4
-; CHECK-NEXT:    cmp x8, #64
+; CHECK-NEXT:    str w9, [x0], #4
 ; CHECK-NEXT:    b.ne .LBB28_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -420,14 +417,13 @@ for.body:
 define void @array_and_not_i64(ptr %a, i64 %m) {
 ; CHECK-LABEL: array_and_not_i64:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB29_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr x9, [x0, x8]
+; CHECK-NEXT:    ldr x9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    bic x9, x9, x1
-; CHECK-NEXT:    str x9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #8
-; CHECK-NEXT:    cmp x8, #128
+; CHECK-NEXT:    str x9, [x0], #8
 ; CHECK-NEXT:    b.ne .LBB29_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -452,14 +448,13 @@ for.body:
 define void @array_or_not_i8(ptr %a, i8 %m) {
 ; CHECK-LABEL: array_or_not_i8:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB30_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldrb w9, [x0, x8]
+; CHECK-NEXT:    ldrb w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    orn w9, w9, w1
-; CHECK-NEXT:    strb w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #1
-; CHECK-NEXT:    cmp x8, #16
+; CHECK-NEXT:    strb w9, [x0], #1
 ; CHECK-NEXT:    b.ne .LBB30_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -484,14 +479,13 @@ for.body:
 define void @array_or_not_i16(ptr %a, i16 %m) {
 ; CHECK-LABEL: array_or_not_i16:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB31_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldrh w9, [x0, x8]
+; CHECK-NEXT:    ldrh w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    orn w9, w9, w1
-; CHECK-NEXT:    strh w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #2
-; CHECK-NEXT:    cmp x8, #32
+; CHECK-NEXT:    strh w9, [x0], #2
 ; CHECK-NEXT:    b.ne .LBB31_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -516,14 +510,13 @@ for.body:
 define void @array_or_not_i32(ptr %a, i32 %m) {
 ; CHECK-LABEL: array_or_not_i32:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB32_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr w9, [x0, x8]
+; CHECK-NEXT:    ldr w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    orn w9, w9, w1
-; CHECK-NEXT:    str w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #4
-; CHECK-NEXT:    cmp x8, #64
+; CHECK-NEXT:    str w9, [x0], #4
 ; CHECK-NEXT:    b.ne .LBB32_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -548,14 +541,13 @@ for.body:
 define void @array_or_not_i64(ptr %a, i64 %m) {
 ; CHECK-LABEL: array_or_not_i64:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB33_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr x9, [x0, x8]
+; CHECK-NEXT:    ldr x9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    orn x9, x9, x1
-; CHECK-NEXT:    str x9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #8
-; CHECK-NEXT:    cmp x8, #128
+; CHECK-NEXT:    str x9, [x0], #8
 ; CHECK-NEXT:    b.ne .LBB33_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -580,14 +572,13 @@ for.body:
 define void @array_xor_not_i8(ptr %a, i8 %m) {
 ; CHECK-LABEL: array_xor_not_i8:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB34_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldrb w9, [x0, x8]
+; CHECK-NEXT:    ldrb w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    eon w9, w1, w9
-; CHECK-NEXT:    strb w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #1
-; CHECK-NEXT:    cmp x8, #16
+; CHECK-NEXT:    strb w9, [x0], #1
 ; CHECK-NEXT:    b.ne .LBB34_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -612,14 +603,13 @@ for.body:
 define void @array_xor_not_i16(ptr %a, i16 %m) {
 ; CHECK-LABEL: array_xor_not_i16:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB35_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldrh w9, [x0, x8]
+; CHECK-NEXT:    ldrh w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    eon w9, w1, w9
-; CHECK-NEXT:    strh w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #2
-; CHECK-NEXT:    cmp x8, #32
+; CHECK-NEXT:    strh w9, [x0], #2
 ; CHECK-NEXT:    b.ne .LBB35_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -644,14 +634,13 @@ for.body:
 define void @array_xor_not_i32(ptr %a, i32 %m) {
 ; CHECK-LABEL: array_xor_not_i32:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB36_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr w9, [x0, x8]
+; CHECK-NEXT:    ldr w9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    eon w9, w1, w9
-; CHECK-NEXT:    str w9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #4
-; CHECK-NEXT:    cmp x8, #64
+; CHECK-NEXT:    str w9, [x0], #4
 ; CHECK-NEXT:    b.ne .LBB36_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -676,14 +665,13 @@ for.body:
 define void @array_xor_not_i64(ptr %a, i64 %m) {
 ; CHECK-LABEL: array_xor_not_i64:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #16 // =0x10
 ; CHECK-NEXT:  .LBB37_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr x9, [x0, x8]
+; CHECK-NEXT:    ldr x9, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    eon x9, x1, x9
-; CHECK-NEXT:    str x9, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #8
-; CHECK-NEXT:    cmp x8, #128
+; CHECK-NEXT:    str x9, [x0], #8
 ; CHECK-NEXT:    b.ne .LBB37_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -708,15 +696,14 @@ for.body:
 define void @array_and_lsl2_not_i32(ptr %a, i32 %m) {
 ; CHECK-LABEL: array_and_lsl2_not_i32:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:    mvn w9, w1
 ; CHECK-NEXT:  .LBB38_1: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr w10, [x0, x8]
+; CHECK-NEXT:    ldr w10, [x0]
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    and w10, w9, w10, lsl #2
-; CHECK-NEXT:    str w10, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #4
-; CHECK-NEXT:    cmp x8, #1024
+; CHECK-NEXT:    str w10, [x0], #4
 ; CHECK-NEXT:    b.ne .LBB38_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret

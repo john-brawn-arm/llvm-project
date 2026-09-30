@@ -53,21 +53,19 @@ define void @loop1(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-NEXT:    b.eq .LBB0_8
 ; CHECK-NEXT:  .LBB0_6: // %for.body.preheader1
 ; CHECK-NEXT:    movi d0, #0000000000000000
-; CHECK-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-NEXT:    mov x11, xzr
-; CHECK-NEXT:    fmov s1, w12
+; CHECK-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-NEXT:    sub w10, w2, w10
+; CHECK-NEXT:    fmov s1, w11
 ; CHECK-NEXT:  .LBB0_7: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr s2, [x8, x11, lsl #2]
+; CHECK-NEXT:    ldr s2, [x8], #4
 ; CHECK-NEXT:    fcmp s2, s1
 ; CHECK-NEXT:    fcsel s3, s1, s2, gt
 ; CHECK-NEXT:    fcmp s2, #0.0
 ; CHECK-NEXT:    fcsel s2, s0, s3, mi
+; CHECK-NEXT:    subs w10, w10, #1
 ; CHECK-NEXT:    fcvtzs s2, s2
-; CHECK-NEXT:    str b2, [x9, x11]
-; CHECK-NEXT:    add x11, x11, #1
-; CHECK-NEXT:    cmp w10, w11
+; CHECK-NEXT:    st1 { v2.b }[0], [x9], #1
 ; CHECK-NEXT:    b.ne .LBB0_7
 ; CHECK-NEXT:  .LBB0_8: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -166,16 +164,12 @@ define void @loop2(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IAENABLED-NEXT:    mov x9, x0
 ; CHECK-IAENABLED-NEXT:  .LBB1_4: // %for.body.preheader1
 ; CHECK-IAENABLED-NEXT:    movi d0, #0000000000000000
-; CHECK-IAENABLED-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-IAENABLED-NEXT:    mov x11, xzr
-; CHECK-IAENABLED-NEXT:    fmov s1, w12
+; CHECK-IAENABLED-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-IAENABLED-NEXT:    sub w10, w2, w10
+; CHECK-IAENABLED-NEXT:    fmov s1, w11
 ; CHECK-IAENABLED-NEXT:  .LBB1_5: // %for.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IAENABLED-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-IAENABLED-NEXT:    ldp s2, s3, [x12]
-; CHECK-IAENABLED-NEXT:    add x12, x9, x11
-; CHECK-IAENABLED-NEXT:    add x11, x11, #2
+; CHECK-IAENABLED-NEXT:    ldp s2, s3, [x8], #8
 ; CHECK-IAENABLED-NEXT:    fcmp s2, s1
 ; CHECK-IAENABLED-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s2, #0.0
@@ -186,9 +180,10 @@ define void @loop2(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IAENABLED-NEXT:    fcvtzs s2, s2
 ; CHECK-IAENABLED-NEXT:    fcsel s3, s0, s4, mi
 ; CHECK-IAENABLED-NEXT:    subs w10, w10, #1
-; CHECK-IAENABLED-NEXT:    str b2, [x12]
+; CHECK-IAENABLED-NEXT:    str b2, [x9]
 ; CHECK-IAENABLED-NEXT:    fcvtzs s3, s3
-; CHECK-IAENABLED-NEXT:    stur b3, [x12, #1]
+; CHECK-IAENABLED-NEXT:    stur b3, [x9, #1]
+; CHECK-IAENABLED-NEXT:    add x9, x9, #2
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB1_5
 ; CHECK-IAENABLED-NEXT:  .LBB1_6: // %for.cond.cleanup
 ; CHECK-IAENABLED-NEXT:    ret
@@ -245,16 +240,12 @@ define void @loop2(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IADISABLED-NEXT:    mov x9, x0
 ; CHECK-IADISABLED-NEXT:  .LBB1_4: // %for.body.preheader1
 ; CHECK-IADISABLED-NEXT:    movi d0, #0000000000000000
-; CHECK-IADISABLED-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-IADISABLED-NEXT:    mov x11, xzr
-; CHECK-IADISABLED-NEXT:    fmov s1, w12
+; CHECK-IADISABLED-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-IADISABLED-NEXT:    sub w10, w2, w10
+; CHECK-IADISABLED-NEXT:    fmov s1, w11
 ; CHECK-IADISABLED-NEXT:  .LBB1_5: // %for.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IADISABLED-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-IADISABLED-NEXT:    ldp s2, s3, [x12]
-; CHECK-IADISABLED-NEXT:    add x12, x9, x11
-; CHECK-IADISABLED-NEXT:    add x11, x11, #2
+; CHECK-IADISABLED-NEXT:    ldp s2, s3, [x8], #8
 ; CHECK-IADISABLED-NEXT:    fcmp s2, s1
 ; CHECK-IADISABLED-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s2, #0.0
@@ -265,9 +256,10 @@ define void @loop2(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IADISABLED-NEXT:    fcvtzs s2, s2
 ; CHECK-IADISABLED-NEXT:    fcsel s3, s0, s4, mi
 ; CHECK-IADISABLED-NEXT:    subs w10, w10, #1
-; CHECK-IADISABLED-NEXT:    str b2, [x12]
+; CHECK-IADISABLED-NEXT:    str b2, [x9]
 ; CHECK-IADISABLED-NEXT:    fcvtzs s3, s3
-; CHECK-IADISABLED-NEXT:    stur b3, [x12, #1]
+; CHECK-IADISABLED-NEXT:    stur b3, [x9, #1]
+; CHECK-IADISABLED-NEXT:    add x9, x9, #2
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB1_5
 ; CHECK-IADISABLED-NEXT:  .LBB1_6: // %for.cond.cleanup
 ; CHECK-IADISABLED-NEXT:    ret
@@ -423,14 +415,12 @@ define void @loop3(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IAENABLED-NEXT:    mov x9, x0
 ; CHECK-IAENABLED-NEXT:  .LBB2_4: // %for.body.preheader1
 ; CHECK-IAENABLED-NEXT:    movi d0, #0000000000000000
-; CHECK-IAENABLED-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-IAENABLED-NEXT:    mov x11, xzr
-; CHECK-IAENABLED-NEXT:    fmov s1, w12
+; CHECK-IAENABLED-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-IAENABLED-NEXT:    sub w10, w2, w10
+; CHECK-IAENABLED-NEXT:    fmov s1, w11
 ; CHECK-IAENABLED-NEXT:  .LBB2_5: // %for.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IAENABLED-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-IAENABLED-NEXT:    ldp s2, s3, [x12]
+; CHECK-IAENABLED-NEXT:    ldp s2, s3, [x8]
 ; CHECK-IAENABLED-NEXT:    fcmp s2, s1
 ; CHECK-IAENABLED-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s2, #0.0
@@ -438,21 +428,21 @@ define void @loop3(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IAENABLED-NEXT:    fcmp s3, s1
 ; CHECK-IAENABLED-NEXT:    fcsel s4, s1, s3, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s3, #0.0
-; CHECK-IAENABLED-NEXT:    ldr s3, [x12, #8]
+; CHECK-IAENABLED-NEXT:    ldr s3, [x8, #8]
 ; CHECK-IAENABLED-NEXT:    fcvtzs s2, s2
-; CHECK-IAENABLED-NEXT:    add x12, x9, x11
-; CHECK-IAENABLED-NEXT:    add x11, x11, #3
+; CHECK-IAENABLED-NEXT:    add x8, x8, #12
 ; CHECK-IAENABLED-NEXT:    fcsel s4, s0, s4, mi
 ; CHECK-IAENABLED-NEXT:    fcmp s3, s1
-; CHECK-IAENABLED-NEXT:    str b2, [x12]
+; CHECK-IAENABLED-NEXT:    str b2, [x9]
 ; CHECK-IAENABLED-NEXT:    fcsel s5, s1, s3, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s3, #0.0
 ; CHECK-IAENABLED-NEXT:    fcvtzs s4, s4
 ; CHECK-IAENABLED-NEXT:    fcsel s3, s0, s5, mi
 ; CHECK-IAENABLED-NEXT:    subs w10, w10, #1
-; CHECK-IAENABLED-NEXT:    stur b4, [x12, #1]
+; CHECK-IAENABLED-NEXT:    stur b4, [x9, #1]
 ; CHECK-IAENABLED-NEXT:    fcvtzs s3, s3
-; CHECK-IAENABLED-NEXT:    stur b3, [x12, #2]
+; CHECK-IAENABLED-NEXT:    stur b3, [x9, #2]
+; CHECK-IAENABLED-NEXT:    add x9, x9, #3
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB2_5
 ; CHECK-IAENABLED-NEXT:  .LBB2_6: // %for.cond.cleanup
 ; CHECK-IAENABLED-NEXT:    ret
@@ -521,14 +511,12 @@ define void @loop3(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IADISABLED-NEXT:    mov x9, x0
 ; CHECK-IADISABLED-NEXT:  .LBB2_4: // %for.body.preheader1
 ; CHECK-IADISABLED-NEXT:    movi d0, #0000000000000000
-; CHECK-IADISABLED-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-IADISABLED-NEXT:    mov x11, xzr
-; CHECK-IADISABLED-NEXT:    fmov s1, w12
+; CHECK-IADISABLED-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-IADISABLED-NEXT:    sub w10, w2, w10
+; CHECK-IADISABLED-NEXT:    fmov s1, w11
 ; CHECK-IADISABLED-NEXT:  .LBB2_5: // %for.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IADISABLED-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-IADISABLED-NEXT:    ldp s2, s3, [x12]
+; CHECK-IADISABLED-NEXT:    ldp s2, s3, [x8]
 ; CHECK-IADISABLED-NEXT:    fcmp s2, s1
 ; CHECK-IADISABLED-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s2, #0.0
@@ -536,21 +524,21 @@ define void @loop3(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IADISABLED-NEXT:    fcmp s3, s1
 ; CHECK-IADISABLED-NEXT:    fcsel s4, s1, s3, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s3, #0.0
-; CHECK-IADISABLED-NEXT:    ldr s3, [x12, #8]
+; CHECK-IADISABLED-NEXT:    ldr s3, [x8, #8]
 ; CHECK-IADISABLED-NEXT:    fcvtzs s2, s2
-; CHECK-IADISABLED-NEXT:    add x12, x9, x11
-; CHECK-IADISABLED-NEXT:    add x11, x11, #3
+; CHECK-IADISABLED-NEXT:    add x8, x8, #12
 ; CHECK-IADISABLED-NEXT:    fcsel s4, s0, s4, mi
 ; CHECK-IADISABLED-NEXT:    fcmp s3, s1
-; CHECK-IADISABLED-NEXT:    str b2, [x12]
+; CHECK-IADISABLED-NEXT:    str b2, [x9]
 ; CHECK-IADISABLED-NEXT:    fcsel s5, s1, s3, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s3, #0.0
 ; CHECK-IADISABLED-NEXT:    fcvtzs s4, s4
 ; CHECK-IADISABLED-NEXT:    fcsel s3, s0, s5, mi
 ; CHECK-IADISABLED-NEXT:    subs w10, w10, #1
-; CHECK-IADISABLED-NEXT:    stur b4, [x12, #1]
+; CHECK-IADISABLED-NEXT:    stur b4, [x9, #1]
 ; CHECK-IADISABLED-NEXT:    fcvtzs s3, s3
-; CHECK-IADISABLED-NEXT:    stur b3, [x12, #2]
+; CHECK-IADISABLED-NEXT:    stur b3, [x9, #2]
+; CHECK-IADISABLED-NEXT:    add x9, x9, #3
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB2_5
 ; CHECK-IADISABLED-NEXT:  .LBB2_6: // %for.cond.cleanup
 ; CHECK-IADISABLED-NEXT:    ret
@@ -745,14 +733,12 @@ define void @loop4(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IAENABLED-NEXT:    mov x9, x0
 ; CHECK-IAENABLED-NEXT:  .LBB3_4: // %for.body.preheader1
 ; CHECK-IAENABLED-NEXT:    movi d0, #0000000000000000
-; CHECK-IAENABLED-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-IAENABLED-NEXT:    mov x11, xzr
-; CHECK-IAENABLED-NEXT:    fmov s1, w12
+; CHECK-IAENABLED-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-IAENABLED-NEXT:    sub w10, w2, w10
+; CHECK-IAENABLED-NEXT:    fmov s1, w11
 ; CHECK-IAENABLED-NEXT:  .LBB3_5: // %for.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IAENABLED-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-IAENABLED-NEXT:    ldp s2, s3, [x12]
+; CHECK-IAENABLED-NEXT:    ldp s2, s3, [x8]
 ; CHECK-IAENABLED-NEXT:    fcmp s2, s1
 ; CHECK-IAENABLED-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s2, #0.0
@@ -761,26 +747,26 @@ define void @loop4(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IAENABLED-NEXT:    fcsel s4, s1, s3, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s3, #0.0
 ; CHECK-IAENABLED-NEXT:    fcvtzs s2, s2
-; CHECK-IAENABLED-NEXT:    ldp s3, s5, [x12, #8]
-; CHECK-IAENABLED-NEXT:    add x12, x9, x11
-; CHECK-IAENABLED-NEXT:    add x11, x11, #4
+; CHECK-IAENABLED-NEXT:    ldp s3, s5, [x8, #8]
+; CHECK-IAENABLED-NEXT:    add x8, x8, #16
 ; CHECK-IAENABLED-NEXT:    fcsel s4, s0, s4, mi
 ; CHECK-IAENABLED-NEXT:    fcmp s3, s1
-; CHECK-IAENABLED-NEXT:    str b2, [x12]
+; CHECK-IAENABLED-NEXT:    str b2, [x9]
 ; CHECK-IAENABLED-NEXT:    fcvtzs s4, s4
 ; CHECK-IAENABLED-NEXT:    fcsel s6, s1, s3, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s3, #0.0
 ; CHECK-IAENABLED-NEXT:    fcsel s3, s0, s6, mi
 ; CHECK-IAENABLED-NEXT:    fcmp s5, s1
-; CHECK-IAENABLED-NEXT:    stur b4, [x12, #1]
+; CHECK-IAENABLED-NEXT:    stur b4, [x9, #1]
 ; CHECK-IAENABLED-NEXT:    fcsel s6, s1, s5, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s5, #0.0
 ; CHECK-IAENABLED-NEXT:    fcvtzs s3, s3
 ; CHECK-IAENABLED-NEXT:    fcsel s5, s0, s6, mi
 ; CHECK-IAENABLED-NEXT:    subs w10, w10, #1
-; CHECK-IAENABLED-NEXT:    stur b3, [x12, #2]
+; CHECK-IAENABLED-NEXT:    stur b3, [x9, #2]
 ; CHECK-IAENABLED-NEXT:    fcvtzs s5, s5
-; CHECK-IAENABLED-NEXT:    stur b5, [x12, #3]
+; CHECK-IAENABLED-NEXT:    stur b5, [x9, #3]
+; CHECK-IAENABLED-NEXT:    add x9, x9, #4
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB3_5
 ; CHECK-IAENABLED-NEXT:  .LBB3_6: // %for.cond.cleanup
 ; CHECK-IAENABLED-NEXT:    ret
@@ -851,14 +837,12 @@ define void @loop4(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IADISABLED-NEXT:    mov x9, x0
 ; CHECK-IADISABLED-NEXT:  .LBB3_4: // %for.body.preheader1
 ; CHECK-IADISABLED-NEXT:    movi d0, #0000000000000000
-; CHECK-IADISABLED-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-IADISABLED-NEXT:    mov x11, xzr
-; CHECK-IADISABLED-NEXT:    fmov s1, w12
+; CHECK-IADISABLED-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-IADISABLED-NEXT:    sub w10, w2, w10
+; CHECK-IADISABLED-NEXT:    fmov s1, w11
 ; CHECK-IADISABLED-NEXT:  .LBB3_5: // %for.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IADISABLED-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-IADISABLED-NEXT:    ldp s2, s3, [x12]
+; CHECK-IADISABLED-NEXT:    ldp s2, s3, [x8]
 ; CHECK-IADISABLED-NEXT:    fcmp s2, s1
 ; CHECK-IADISABLED-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s2, #0.0
@@ -867,26 +851,26 @@ define void @loop4(ptr noalias nocapture noundef writeonly %dst, ptr nocapture n
 ; CHECK-IADISABLED-NEXT:    fcsel s4, s1, s3, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s3, #0.0
 ; CHECK-IADISABLED-NEXT:    fcvtzs s2, s2
-; CHECK-IADISABLED-NEXT:    ldp s3, s5, [x12, #8]
-; CHECK-IADISABLED-NEXT:    add x12, x9, x11
-; CHECK-IADISABLED-NEXT:    add x11, x11, #4
+; CHECK-IADISABLED-NEXT:    ldp s3, s5, [x8, #8]
+; CHECK-IADISABLED-NEXT:    add x8, x8, #16
 ; CHECK-IADISABLED-NEXT:    fcsel s4, s0, s4, mi
 ; CHECK-IADISABLED-NEXT:    fcmp s3, s1
-; CHECK-IADISABLED-NEXT:    str b2, [x12]
+; CHECK-IADISABLED-NEXT:    str b2, [x9]
 ; CHECK-IADISABLED-NEXT:    fcvtzs s4, s4
 ; CHECK-IADISABLED-NEXT:    fcsel s6, s1, s3, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s3, #0.0
 ; CHECK-IADISABLED-NEXT:    fcsel s3, s0, s6, mi
 ; CHECK-IADISABLED-NEXT:    fcmp s5, s1
-; CHECK-IADISABLED-NEXT:    stur b4, [x12, #1]
+; CHECK-IADISABLED-NEXT:    stur b4, [x9, #1]
 ; CHECK-IADISABLED-NEXT:    fcsel s6, s1, s5, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s5, #0.0
 ; CHECK-IADISABLED-NEXT:    fcvtzs s3, s3
 ; CHECK-IADISABLED-NEXT:    fcsel s5, s0, s6, mi
 ; CHECK-IADISABLED-NEXT:    subs w10, w10, #1
-; CHECK-IADISABLED-NEXT:    stur b3, [x12, #2]
+; CHECK-IADISABLED-NEXT:    stur b3, [x9, #2]
 ; CHECK-IADISABLED-NEXT:    fcvtzs s5, s5
-; CHECK-IADISABLED-NEXT:    stur b5, [x12, #3]
+; CHECK-IADISABLED-NEXT:    stur b5, [x9, #3]
+; CHECK-IADISABLED-NEXT:    add x9, x9, #4
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB3_5
 ; CHECK-IADISABLED-NEXT:  .LBB3_6: // %for.cond.cleanup
 ; CHECK-IADISABLED-NEXT:    ret
@@ -1101,16 +1085,12 @@ define void @loop2_intrinsic(ptr noalias nocapture noundef writeonly %dst, ptr n
 ; CHECK-IAENABLED-NEXT:    mov x9, x0
 ; CHECK-IAENABLED-NEXT:  .LBB4_4: // %for.body.preheader1
 ; CHECK-IAENABLED-NEXT:    movi d0, #0000000000000000
-; CHECK-IAENABLED-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-IAENABLED-NEXT:    mov x11, xzr
-; CHECK-IAENABLED-NEXT:    fmov s1, w12
+; CHECK-IAENABLED-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-IAENABLED-NEXT:    sub w10, w2, w10
+; CHECK-IAENABLED-NEXT:    fmov s1, w11
 ; CHECK-IAENABLED-NEXT:  .LBB4_5: // %for.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IAENABLED-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-IAENABLED-NEXT:    ldp s2, s3, [x12]
-; CHECK-IAENABLED-NEXT:    add x12, x9, x11
-; CHECK-IAENABLED-NEXT:    add x11, x11, #2
+; CHECK-IAENABLED-NEXT:    ldp s2, s3, [x8], #8
 ; CHECK-IAENABLED-NEXT:    fcmp s2, s1
 ; CHECK-IAENABLED-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-IAENABLED-NEXT:    fcmp s2, #0.0
@@ -1121,9 +1101,10 @@ define void @loop2_intrinsic(ptr noalias nocapture noundef writeonly %dst, ptr n
 ; CHECK-IAENABLED-NEXT:    fcvtzs s2, s2
 ; CHECK-IAENABLED-NEXT:    fcsel s3, s0, s4, mi
 ; CHECK-IAENABLED-NEXT:    subs w10, w10, #1
-; CHECK-IAENABLED-NEXT:    str b2, [x12]
+; CHECK-IAENABLED-NEXT:    str b2, [x9]
 ; CHECK-IAENABLED-NEXT:    fcvtzs s3, s3
-; CHECK-IAENABLED-NEXT:    stur b3, [x12, #1]
+; CHECK-IAENABLED-NEXT:    stur b3, [x9, #1]
+; CHECK-IAENABLED-NEXT:    add x9, x9, #2
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB4_5
 ; CHECK-IAENABLED-NEXT:  .LBB4_6: // %for.cond.cleanup
 ; CHECK-IAENABLED-NEXT:    ret
@@ -1180,16 +1161,12 @@ define void @loop2_intrinsic(ptr noalias nocapture noundef writeonly %dst, ptr n
 ; CHECK-IADISABLED-NEXT:    mov x9, x0
 ; CHECK-IADISABLED-NEXT:  .LBB4_4: // %for.body.preheader1
 ; CHECK-IADISABLED-NEXT:    movi d0, #0000000000000000
-; CHECK-IADISABLED-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-IADISABLED-NEXT:    mov x11, xzr
-; CHECK-IADISABLED-NEXT:    fmov s1, w12
+; CHECK-IADISABLED-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-IADISABLED-NEXT:    sub w10, w2, w10
+; CHECK-IADISABLED-NEXT:    fmov s1, w11
 ; CHECK-IADISABLED-NEXT:  .LBB4_5: // %for.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IADISABLED-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-IADISABLED-NEXT:    ldp s2, s3, [x12]
-; CHECK-IADISABLED-NEXT:    add x12, x9, x11
-; CHECK-IADISABLED-NEXT:    add x11, x11, #2
+; CHECK-IADISABLED-NEXT:    ldp s2, s3, [x8], #8
 ; CHECK-IADISABLED-NEXT:    fcmp s2, s1
 ; CHECK-IADISABLED-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-IADISABLED-NEXT:    fcmp s2, #0.0
@@ -1200,9 +1177,10 @@ define void @loop2_intrinsic(ptr noalias nocapture noundef writeonly %dst, ptr n
 ; CHECK-IADISABLED-NEXT:    fcvtzs s2, s2
 ; CHECK-IADISABLED-NEXT:    fcsel s3, s0, s4, mi
 ; CHECK-IADISABLED-NEXT:    subs w10, w10, #1
-; CHECK-IADISABLED-NEXT:    str b2, [x12]
+; CHECK-IADISABLED-NEXT:    str b2, [x9]
 ; CHECK-IADISABLED-NEXT:    fcvtzs s3, s3
-; CHECK-IADISABLED-NEXT:    stur b3, [x12, #1]
+; CHECK-IADISABLED-NEXT:    stur b3, [x9, #1]
+; CHECK-IADISABLED-NEXT:    add x9, x9, #2
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB4_5
 ; CHECK-IADISABLED-NEXT:  .LBB4_6: // %for.cond.cleanup
 ; CHECK-IADISABLED-NEXT:    ret
@@ -1362,14 +1340,12 @@ define void @loop3_intrinsic(ptr noalias nocapture noundef writeonly %dst, ptr n
 ; CHECK-NEXT:    mov x9, x0
 ; CHECK-NEXT:  .LBB5_4: // %for.body.preheader1
 ; CHECK-NEXT:    movi d0, #0000000000000000
-; CHECK-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-NEXT:    mov x11, xzr
-; CHECK-NEXT:    fmov s1, w12
+; CHECK-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-NEXT:    sub w10, w2, w10
+; CHECK-NEXT:    fmov s1, w11
 ; CHECK-NEXT:  .LBB5_5: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-NEXT:    ldp s2, s3, [x12]
+; CHECK-NEXT:    ldp s2, s3, [x8]
 ; CHECK-NEXT:    fcmp s2, s1
 ; CHECK-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-NEXT:    fcmp s2, #0.0
@@ -1377,21 +1353,21 @@ define void @loop3_intrinsic(ptr noalias nocapture noundef writeonly %dst, ptr n
 ; CHECK-NEXT:    fcmp s3, s1
 ; CHECK-NEXT:    fcsel s4, s1, s3, gt
 ; CHECK-NEXT:    fcmp s3, #0.0
-; CHECK-NEXT:    ldr s3, [x12, #8]
+; CHECK-NEXT:    ldr s3, [x8, #8]
 ; CHECK-NEXT:    fcvtzs s2, s2
-; CHECK-NEXT:    add x12, x9, x11
-; CHECK-NEXT:    add x11, x11, #3
+; CHECK-NEXT:    add x8, x8, #12
 ; CHECK-NEXT:    fcsel s4, s0, s4, mi
 ; CHECK-NEXT:    fcmp s3, s1
-; CHECK-NEXT:    str b2, [x12]
+; CHECK-NEXT:    str b2, [x9]
 ; CHECK-NEXT:    fcsel s5, s1, s3, gt
 ; CHECK-NEXT:    fcmp s3, #0.0
 ; CHECK-NEXT:    fcvtzs s4, s4
 ; CHECK-NEXT:    fcsel s3, s0, s5, mi
 ; CHECK-NEXT:    subs w10, w10, #1
-; CHECK-NEXT:    stur b4, [x12, #1]
+; CHECK-NEXT:    stur b4, [x9, #1]
 ; CHECK-NEXT:    fcvtzs s3, s3
-; CHECK-NEXT:    stur b3, [x12, #2]
+; CHECK-NEXT:    stur b3, [x9, #2]
+; CHECK-NEXT:    add x9, x9, #3
 ; CHECK-NEXT:    b.ne .LBB5_5
 ; CHECK-NEXT:  .LBB5_6:
 ; CHECK-NEXT:    add sp, sp, #32
@@ -1580,14 +1556,12 @@ define void @loop4_intrinsic(ptr noalias nocapture noundef writeonly %dst, ptr n
 ; CHECK-NEXT:    mov x9, x0
 ; CHECK-NEXT:  .LBB6_4: // %for.body.preheader1
 ; CHECK-NEXT:    movi d0, #0000000000000000
-; CHECK-NEXT:    mov w12, #1132396544 // =0x437f0000
-; CHECK-NEXT:    mov x11, xzr
-; CHECK-NEXT:    fmov s1, w12
+; CHECK-NEXT:    mov w11, #1132396544 // =0x437f0000
 ; CHECK-NEXT:    sub w10, w2, w10
+; CHECK-NEXT:    fmov s1, w11
 ; CHECK-NEXT:  .LBB6_5: // %for.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    add x12, x8, x11, lsl #2
-; CHECK-NEXT:    ldp s2, s3, [x12]
+; CHECK-NEXT:    ldp s2, s3, [x8]
 ; CHECK-NEXT:    fcmp s2, s1
 ; CHECK-NEXT:    fcsel s4, s1, s2, gt
 ; CHECK-NEXT:    fcmp s2, #0.0
@@ -1596,26 +1570,26 @@ define void @loop4_intrinsic(ptr noalias nocapture noundef writeonly %dst, ptr n
 ; CHECK-NEXT:    fcsel s4, s1, s3, gt
 ; CHECK-NEXT:    fcmp s3, #0.0
 ; CHECK-NEXT:    fcvtzs s2, s2
-; CHECK-NEXT:    ldp s3, s5, [x12, #8]
-; CHECK-NEXT:    add x12, x9, x11
-; CHECK-NEXT:    add x11, x11, #4
+; CHECK-NEXT:    ldp s3, s5, [x8, #8]
+; CHECK-NEXT:    add x8, x8, #16
 ; CHECK-NEXT:    fcsel s4, s0, s4, mi
 ; CHECK-NEXT:    fcmp s3, s1
-; CHECK-NEXT:    str b2, [x12]
+; CHECK-NEXT:    str b2, [x9]
 ; CHECK-NEXT:    fcvtzs s4, s4
 ; CHECK-NEXT:    fcsel s6, s1, s3, gt
 ; CHECK-NEXT:    fcmp s3, #0.0
 ; CHECK-NEXT:    fcsel s3, s0, s6, mi
 ; CHECK-NEXT:    fcmp s5, s1
-; CHECK-NEXT:    stur b4, [x12, #1]
+; CHECK-NEXT:    stur b4, [x9, #1]
 ; CHECK-NEXT:    fcsel s6, s1, s5, gt
 ; CHECK-NEXT:    fcmp s5, #0.0
 ; CHECK-NEXT:    fcvtzs s3, s3
 ; CHECK-NEXT:    fcsel s5, s0, s6, mi
 ; CHECK-NEXT:    subs w10, w10, #1
-; CHECK-NEXT:    stur b3, [x12, #2]
+; CHECK-NEXT:    stur b3, [x9, #2]
 ; CHECK-NEXT:    fcvtzs s5, s5
-; CHECK-NEXT:    stur b5, [x12, #3]
+; CHECK-NEXT:    stur b5, [x9, #3]
+; CHECK-NEXT:    add x9, x9, #4
 ; CHECK-NEXT:    b.ne .LBB6_5
 ; CHECK-NEXT:  .LBB6_6: // %for.cond.cleanup
 ; CHECK-NEXT:    ret

@@ -7,15 +7,14 @@ define void @vld2(ptr nocapture readonly %pSrc, ptr noalias nocapture %pDst, i32
 ; CHECK-IAENABLED:       .Lfunc_begin0:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB0_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld2 { v0.4s, v1.4s }, [x0], #32
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v2.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v2.4s, v1.4s, v1.4s
-; CHECK-IAENABLED-NEXT:    str q2, [x1, x8]
-; CHECK-IAENABLED-NEXT:    add x8, x8, #16
-; CHECK-IAENABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IAENABLED-NEXT:    str q2, [x1], #16
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB0_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -24,16 +23,15 @@ define void @vld2(ptr nocapture readonly %pSrc, ptr noalias nocapture %pDst, i32
 ; CHECK-IADISABLED:       .Lfunc_begin0:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB0_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ldp q0, q1, [x0], #32
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    fmul v1.4s, v1.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    fmul v0.4s, v0.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    faddp v0.4s, v0.4s, v1.4s
-; CHECK-IADISABLED-NEXT:    str q0, [x1, x8]
-; CHECK-IADISABLED-NEXT:    add x8, x8, #16
-; CHECK-IADISABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IADISABLED-NEXT:    str q0, [x1], #16
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB0_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret
@@ -65,16 +63,15 @@ define void @vld3(ptr nocapture readonly %pSrc, ptr noalias nocapture %pDst, i32
 ; CHECK-IAENABLED:       .Lfunc_begin1:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB1_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld3 { v0.4s, v1.4s, v2.4s }, [x0], #48
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v3.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v3.4s, v1.4s, v1.4s
 ; CHECK-IAENABLED-NEXT:    fmla v3.4s, v2.4s, v2.4s
-; CHECK-IAENABLED-NEXT:    str q3, [x1, x8]
-; CHECK-IAENABLED-NEXT:    add x8, x8, #16
-; CHECK-IAENABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IAENABLED-NEXT:    str q3, [x1], #16
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB1_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -83,15 +80,16 @@ define void @vld3(ptr nocapture readonly %pSrc, ptr noalias nocapture %pDst, i32
 ; CHECK-IADISABLED:       .Lfunc_begin1:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB1_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ldp q0, q1, [x0]
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    ldr q4, [x0, #32]
 ; CHECK-IADISABLED-NEXT:    add x0, x0, #48
-; CHECK-IADISABLED-NEXT:    fmul v4.4s, v4.4s, v4.4s
 ; CHECK-IADISABLED-NEXT:    fmul v0.4s, v0.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    fmul v1.4s, v1.4s, v1.4s
+; CHECK-IADISABLED-NEXT:    fmul v4.4s, v4.4s, v4.4s
 ; CHECK-IADISABLED-NEXT:    mov v2.16b, v0.16b
 ; CHECK-IADISABLED-NEXT:    rev64 v3.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    mov v2.s[1], v0.s[3]
@@ -104,9 +102,7 @@ define void @vld3(ptr nocapture readonly %pSrc, ptr noalias nocapture %pDst, i32
 ; CHECK-IADISABLED-NEXT:    fadd v0.4s, v3.4s, v2.4s
 ; CHECK-IADISABLED-NEXT:    mov v1.s[3], v4.s[3]
 ; CHECK-IADISABLED-NEXT:    fadd v0.4s, v0.4s, v1.4s
-; CHECK-IADISABLED-NEXT:    str q0, [x1, x8]
-; CHECK-IADISABLED-NEXT:    add x8, x8, #16
-; CHECK-IADISABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IADISABLED-NEXT:    str q0, [x1], #16
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB1_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret
@@ -141,18 +137,16 @@ define void @vld4(ptr nocapture readonly %pSrc, ptr noalias nocapture %pDst, i32
 ; CHECK-IAENABLED:       .Lfunc_begin2:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB2_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld4 { v0.4s, v1.4s, v2.4s, v3.4s }, [x0], #64
-; CHECK-IAENABLED-NEXT:    add x9, x1, x8
-; CHECK-IAENABLED-NEXT:    add x8, x8, #32
-; CHECK-IAENABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v4.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v4.4s, v1.4s, v1.4s
 ; CHECK-IAENABLED-NEXT:    fmul v5.4s, v2.4s, v2.4s
 ; CHECK-IAENABLED-NEXT:    fmla v5.4s, v3.4s, v3.4s
-; CHECK-IAENABLED-NEXT:    st2 { v4.4s, v5.4s }, [x9]
+; CHECK-IAENABLED-NEXT:    st2 { v4.4s, v5.4s }, [x1], #32
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB2_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -161,14 +155,12 @@ define void @vld4(ptr nocapture readonly %pSrc, ptr noalias nocapture %pDst, i32
 ; CHECK-IADISABLED:       .Lfunc_begin2:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB2_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ldp q0, q1, [x0]
-; CHECK-IADISABLED-NEXT:    add x9, x1, x8
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    ldp q2, q3, [x0, #32]
-; CHECK-IADISABLED-NEXT:    add x8, x8, #32
-; CHECK-IADISABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
 ; CHECK-IADISABLED-NEXT:    add x0, x0, #64
 ; CHECK-IADISABLED-NEXT:    fmul v1.4s, v1.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    fmul v0.4s, v0.4s, v0.4s
@@ -191,7 +183,7 @@ define void @vld4(ptr nocapture readonly %pSrc, ptr noalias nocapture %pDst, i32
 ; CHECK-IADISABLED-NEXT:    fadd v2.4s, v7.4s, v6.4s
 ; CHECK-IADISABLED-NEXT:    zip2 v1.4s, v2.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    zip1 v0.4s, v2.4s, v0.4s
-; CHECK-IADISABLED-NEXT:    stp q0, q1, [x9]
+; CHECK-IADISABLED-NEXT:    stp q0, q1, [x1], #32
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB2_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret
@@ -230,15 +222,12 @@ define void @twosrc(ptr nocapture readonly %pSrc, ptr nocapture readonly %pSrc2,
 ; CHECK-IAENABLED:       .Lfunc_begin3:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB3_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IAENABLED-NEXT:    add x9, x0, x8
-; CHECK-IAENABLED-NEXT:    add x10, x1, x8
-; CHECK-IAENABLED-NEXT:    add x8, x8, #32
-; CHECK-IAENABLED-NEXT:    ld2 { v0.4s, v1.4s }, [x9]
-; CHECK-IAENABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
-; CHECK-IAENABLED-NEXT:    ld2 { v2.4s, v3.4s }, [x10]
+; CHECK-IAENABLED-NEXT:    ld2 { v0.4s, v1.4s }, [x0], #32
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
+; CHECK-IAENABLED-NEXT:    ld2 { v2.4s, v3.4s }, [x1], #32
 ; CHECK-IAENABLED-NEXT:    fmul v4.4s, v2.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v4.4s, v1.4s, v3.4s
 ; CHECK-IAENABLED-NEXT:    str q4, [x2], #16
@@ -250,15 +239,12 @@ define void @twosrc(ptr nocapture readonly %pSrc, ptr nocapture readonly %pSrc2,
 ; CHECK-IADISABLED:       .Lfunc_begin3:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB3_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-IADISABLED-NEXT:    add x9, x0, x8
-; CHECK-IADISABLED-NEXT:    add x10, x1, x8
-; CHECK-IADISABLED-NEXT:    add x8, x8, #32
-; CHECK-IADISABLED-NEXT:    ldp q0, q1, [x9]
-; CHECK-IADISABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
-; CHECK-IADISABLED-NEXT:    ldp q2, q3, [x10]
+; CHECK-IADISABLED-NEXT:    ldp q0, q1, [x0], #32
+; CHECK-IADISABLED-NEXT:    ldp q2, q3, [x1], #32
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    fmul v1.4s, v3.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    fmul v0.4s, v2.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    faddp v0.4s, v0.4s, v1.4s
@@ -297,15 +283,14 @@ define void @vld2_multiuse(ptr nocapture readonly %pSrc, ptr noalias nocapture %
 ; CHECK-IAENABLED:       .Lfunc_begin4:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB4_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld2 { v0.4s, v1.4s }, [x0], #32
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v2.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v2.4s, v1.4s, v1.4s
-; CHECK-IAENABLED-NEXT:    str q2, [x1, x8]
-; CHECK-IAENABLED-NEXT:    add x8, x8, #16
-; CHECK-IAENABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IAENABLED-NEXT:    str q2, [x1], #16
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB4_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -314,16 +299,15 @@ define void @vld2_multiuse(ptr nocapture readonly %pSrc, ptr noalias nocapture %
 ; CHECK-IADISABLED:       .Lfunc_begin4:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB4_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ldp q0, q1, [x0], #32
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    fmul v1.4s, v1.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    fmul v0.4s, v0.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    faddp v0.4s, v0.4s, v1.4s
-; CHECK-IADISABLED-NEXT:    str q0, [x1, x8]
-; CHECK-IADISABLED-NEXT:    add x8, x8, #16
-; CHECK-IADISABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IADISABLED-NEXT:    str q0, [x1], #16
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB4_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret
@@ -354,16 +338,15 @@ define void @vld3_multiuse(ptr nocapture readonly %pSrc, ptr noalias nocapture %
 ; CHECK-IAENABLED:       .Lfunc_begin5:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB5_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld3 { v0.4s, v1.4s, v2.4s }, [x0], #48
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v3.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v3.4s, v1.4s, v1.4s
 ; CHECK-IAENABLED-NEXT:    fmla v3.4s, v2.4s, v2.4s
-; CHECK-IAENABLED-NEXT:    str q3, [x1, x8]
-; CHECK-IAENABLED-NEXT:    add x8, x8, #16
-; CHECK-IAENABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IAENABLED-NEXT:    str q3, [x1], #16
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB5_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -372,15 +355,16 @@ define void @vld3_multiuse(ptr nocapture readonly %pSrc, ptr noalias nocapture %
 ; CHECK-IADISABLED:       .Lfunc_begin5:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB5_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ldp q0, q1, [x0]
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    ldr q4, [x0, #32]
 ; CHECK-IADISABLED-NEXT:    add x0, x0, #48
-; CHECK-IADISABLED-NEXT:    fmul v4.4s, v4.4s, v4.4s
 ; CHECK-IADISABLED-NEXT:    fmul v0.4s, v0.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    fmul v1.4s, v1.4s, v1.4s
+; CHECK-IADISABLED-NEXT:    fmul v4.4s, v4.4s, v4.4s
 ; CHECK-IADISABLED-NEXT:    mov v2.16b, v0.16b
 ; CHECK-IADISABLED-NEXT:    rev64 v3.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    mov v2.s[1], v0.s[3]
@@ -393,9 +377,7 @@ define void @vld3_multiuse(ptr nocapture readonly %pSrc, ptr noalias nocapture %
 ; CHECK-IADISABLED-NEXT:    fadd v0.4s, v3.4s, v2.4s
 ; CHECK-IADISABLED-NEXT:    mov v1.s[3], v4.s[3]
 ; CHECK-IADISABLED-NEXT:    fadd v0.4s, v0.4s, v1.4s
-; CHECK-IADISABLED-NEXT:    str q0, [x1, x8]
-; CHECK-IADISABLED-NEXT:    add x8, x8, #16
-; CHECK-IADISABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IADISABLED-NEXT:    str q0, [x1], #16
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB5_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret
@@ -428,18 +410,16 @@ define void @vld4_multiuse(ptr nocapture readonly %pSrc, ptr noalias nocapture %
 ; CHECK-IAENABLED:       .Lfunc_begin6:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB6_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld4 { v0.4s, v1.4s, v2.4s, v3.4s }, [x0], #64
-; CHECK-IAENABLED-NEXT:    add x9, x1, x8
-; CHECK-IAENABLED-NEXT:    add x8, x8, #32
-; CHECK-IAENABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v4.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v4.4s, v1.4s, v1.4s
 ; CHECK-IAENABLED-NEXT:    fmul v5.4s, v2.4s, v2.4s
 ; CHECK-IAENABLED-NEXT:    fmla v5.4s, v3.4s, v3.4s
-; CHECK-IAENABLED-NEXT:    st2 { v4.4s, v5.4s }, [x9]
+; CHECK-IAENABLED-NEXT:    st2 { v4.4s, v5.4s }, [x1], #32
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB6_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -448,14 +428,12 @@ define void @vld4_multiuse(ptr nocapture readonly %pSrc, ptr noalias nocapture %
 ; CHECK-IADISABLED:       .Lfunc_begin6:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB6_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ldp q0, q1, [x0]
-; CHECK-IADISABLED-NEXT:    add x9, x1, x8
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    ldp q2, q3, [x0, #32]
-; CHECK-IADISABLED-NEXT:    add x8, x8, #32
-; CHECK-IADISABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
 ; CHECK-IADISABLED-NEXT:    add x0, x0, #64
 ; CHECK-IADISABLED-NEXT:    fmul v1.4s, v1.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    fmul v0.4s, v0.4s, v0.4s
@@ -478,7 +456,7 @@ define void @vld4_multiuse(ptr nocapture readonly %pSrc, ptr noalias nocapture %
 ; CHECK-IADISABLED-NEXT:    fadd v2.4s, v7.4s, v6.4s
 ; CHECK-IADISABLED-NEXT:    zip2 v1.4s, v2.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    zip1 v0.4s, v2.4s, v0.4s
-; CHECK-IADISABLED-NEXT:    stp q0, q1, [x9]
+; CHECK-IADISABLED-NEXT:    stp q0, q1, [x1], #32
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB6_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret
@@ -1072,17 +1050,16 @@ define void @vld2_intrinsic(ptr nocapture readonly %pSrc, ptr noalias nocapture 
 ; CHECK:       .Lfunc_begin17:
 ; CHECK-NEXT:    .cfi_startproc
 ; CHECK-NEXT:  // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-NEXT:  .LBB17_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-NEXT:    ldp q1, q0, [x0], #32
+; CHECK-NEXT:    subs x8, x8, #4
 ; CHECK-NEXT:    uzp1 v2.4s, v1.4s, v0.4s
 ; CHECK-NEXT:    uzp2 v0.4s, v1.4s, v0.4s
 ; CHECK-NEXT:    fmul v1.4s, v2.4s, v2.4s
 ; CHECK-NEXT:    fmla v1.4s, v0.4s, v0.4s
-; CHECK-NEXT:    str q1, [x1, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-NEXT:    str q1, [x1], #16
 ; CHECK-NEXT:    b.ne .LBB17_1
 ; CHECK-NEXT:  // %bb.2: // %while.end
 ; CHECK-NEXT:    ret
@@ -1117,16 +1094,15 @@ define void @vld3_intrinsic(ptr nocapture readonly %pSrc, ptr noalias nocapture 
 ; CHECK:       .Lfunc_begin18:
 ; CHECK-NEXT:    .cfi_startproc
 ; CHECK-NEXT:  // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-NEXT:  .LBB18_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-NEXT:    ld3 { v0.4s, v1.4s, v2.4s }, [x0], #48
+; CHECK-NEXT:    subs x8, x8, #4
 ; CHECK-NEXT:    fmul v3.4s, v0.4s, v0.4s
 ; CHECK-NEXT:    fmla v3.4s, v1.4s, v1.4s
 ; CHECK-NEXT:    fmla v3.4s, v2.4s, v2.4s
-; CHECK-NEXT:    str q3, [x1, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-NEXT:    str q3, [x1], #16
 ; CHECK-NEXT:    b.ne .LBB18_1
 ; CHECK-NEXT:  // %bb.2: // %while.end
 ; CHECK-NEXT:    ret
@@ -1165,18 +1141,16 @@ define void @vld4_intrinsic(ptr nocapture readonly %pSrc, ptr noalias nocapture 
 ; CHECK-IAENABLED:       .Lfunc_begin19:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB19_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld4 { v0.4s, v1.4s, v2.4s, v3.4s }, [x0], #64
-; CHECK-IAENABLED-NEXT:    add x9, x1, x8
-; CHECK-IAENABLED-NEXT:    add x8, x8, #32
-; CHECK-IAENABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v4.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v4.4s, v1.4s, v1.4s
 ; CHECK-IAENABLED-NEXT:    fmul v5.4s, v2.4s, v2.4s
 ; CHECK-IAENABLED-NEXT:    fmla v5.4s, v3.4s, v3.4s
-; CHECK-IAENABLED-NEXT:    st2 { v4.4s, v5.4s }, [x9]
+; CHECK-IAENABLED-NEXT:    st2 { v4.4s, v5.4s }, [x1], #32
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB19_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -1185,20 +1159,18 @@ define void @vld4_intrinsic(ptr nocapture readonly %pSrc, ptr noalias nocapture 
 ; CHECK-IADISABLED:       .Lfunc_begin19:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB19_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ld4 { v0.4s, v1.4s, v2.4s, v3.4s }, [x0], #64
-; CHECK-IADISABLED-NEXT:    add x9, x1, x8
-; CHECK-IADISABLED-NEXT:    add x8, x8, #32
-; CHECK-IADISABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    fmul v4.4s, v0.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    fmul v5.4s, v2.4s, v2.4s
 ; CHECK-IADISABLED-NEXT:    fmla v4.4s, v1.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    fmla v5.4s, v3.4s, v3.4s
 ; CHECK-IADISABLED-NEXT:    zip2 v0.4s, v4.4s, v5.4s
 ; CHECK-IADISABLED-NEXT:    zip1 v1.4s, v4.4s, v5.4s
-; CHECK-IADISABLED-NEXT:    stp q1, q0, [x9]
+; CHECK-IADISABLED-NEXT:    stp q1, q0, [x1], #32
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB19_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret
@@ -1242,15 +1214,12 @@ define void @twosrc_intrinsic(ptr nocapture readonly %pSrc, ptr nocapture readon
 ; CHECK:       .Lfunc_begin20:
 ; CHECK-NEXT:    .cfi_startproc
 ; CHECK-NEXT:  // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-NEXT:  .LBB20_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    add x9, x0, x8
-; CHECK-NEXT:    add x10, x1, x8
-; CHECK-NEXT:    add x8, x8, #32
-; CHECK-NEXT:    ldp q1, q0, [x9]
-; CHECK-NEXT:    cmp x8, #2, lsl #12 // =8192
-; CHECK-NEXT:    ldp q3, q2, [x10]
+; CHECK-NEXT:    ldp q1, q0, [x0], #32
+; CHECK-NEXT:    ldp q3, q2, [x1], #32
+; CHECK-NEXT:    subs x8, x8, #4
 ; CHECK-NEXT:    uzp1 v4.4s, v1.4s, v0.4s
 ; CHECK-NEXT:    uzp2 v0.4s, v1.4s, v0.4s
 ; CHECK-NEXT:    uzp1 v5.4s, v3.4s, v2.4s
@@ -1299,15 +1268,14 @@ define void @vld2_multiuse_intrinsic(ptr nocapture readonly %pSrc, ptr noalias n
 ; CHECK-IAENABLED:       .Lfunc_begin21:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB21_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld2 { v0.4s, v1.4s }, [x0], #32
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v2.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v2.4s, v1.4s, v1.4s
-; CHECK-IAENABLED-NEXT:    str q2, [x1, x8]
-; CHECK-IAENABLED-NEXT:    add x8, x8, #16
-; CHECK-IAENABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IAENABLED-NEXT:    str q2, [x1], #16
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB21_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -1316,17 +1284,16 @@ define void @vld2_multiuse_intrinsic(ptr nocapture readonly %pSrc, ptr noalias n
 ; CHECK-IADISABLED:       .Lfunc_begin21:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB21_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ldp q1, q0, [x0], #32
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    uzp1 v2.4s, v1.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    uzp2 v0.4s, v1.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    fmul v1.4s, v2.4s, v2.4s
 ; CHECK-IADISABLED-NEXT:    fmla v1.4s, v0.4s, v0.4s
-; CHECK-IADISABLED-NEXT:    str q1, [x1, x8]
-; CHECK-IADISABLED-NEXT:    add x8, x8, #16
-; CHECK-IADISABLED-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-IADISABLED-NEXT:    str q1, [x1], #16
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB21_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret
@@ -1360,16 +1327,15 @@ define void @vld3_multiuse_intrinsic(ptr nocapture readonly %pSrc, ptr noalias n
 ; CHECK:       .Lfunc_begin22:
 ; CHECK-NEXT:    .cfi_startproc
 ; CHECK-NEXT:  // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-NEXT:  .LBB22_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-NEXT:    ld3 { v0.4s, v1.4s, v2.4s }, [x0], #48
+; CHECK-NEXT:    subs x8, x8, #4
 ; CHECK-NEXT:    fmul v3.4s, v0.4s, v0.4s
 ; CHECK-NEXT:    fmla v3.4s, v1.4s, v1.4s
 ; CHECK-NEXT:    fmla v3.4s, v2.4s, v2.4s
-; CHECK-NEXT:    str q3, [x1, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #1, lsl #12 // =4096
+; CHECK-NEXT:    str q3, [x1], #16
 ; CHECK-NEXT:    b.ne .LBB22_1
 ; CHECK-NEXT:  // %bb.2: // %while.end
 ; CHECK-NEXT:    ret
@@ -1406,18 +1372,16 @@ define void @vld4_multiuse_intrinsic(ptr nocapture readonly %pSrc, ptr noalias n
 ; CHECK-IAENABLED:       .Lfunc_begin23:
 ; CHECK-IAENABLED-NEXT:    .cfi_startproc
 ; CHECK-IAENABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IAENABLED-NEXT:    mov x8, xzr
+; CHECK-IAENABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IAENABLED-NEXT:  .LBB23_1: // %vector.body
 ; CHECK-IAENABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IAENABLED-NEXT:    ld4 { v0.4s, v1.4s, v2.4s, v3.4s }, [x0], #64
-; CHECK-IAENABLED-NEXT:    add x9, x1, x8
-; CHECK-IAENABLED-NEXT:    add x8, x8, #32
-; CHECK-IAENABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
+; CHECK-IAENABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IAENABLED-NEXT:    fmul v4.4s, v0.4s, v0.4s
 ; CHECK-IAENABLED-NEXT:    fmla v4.4s, v1.4s, v1.4s
 ; CHECK-IAENABLED-NEXT:    fmul v5.4s, v2.4s, v2.4s
 ; CHECK-IAENABLED-NEXT:    fmla v5.4s, v3.4s, v3.4s
-; CHECK-IAENABLED-NEXT:    st2 { v4.4s, v5.4s }, [x9]
+; CHECK-IAENABLED-NEXT:    st2 { v4.4s, v5.4s }, [x1], #32
 ; CHECK-IAENABLED-NEXT:    b.ne .LBB23_1
 ; CHECK-IAENABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IAENABLED-NEXT:    ret
@@ -1426,20 +1390,18 @@ define void @vld4_multiuse_intrinsic(ptr nocapture readonly %pSrc, ptr noalias n
 ; CHECK-IADISABLED:       .Lfunc_begin23:
 ; CHECK-IADISABLED-NEXT:    .cfi_startproc
 ; CHECK-IADISABLED-NEXT:  // %bb.0: // %entry
-; CHECK-IADISABLED-NEXT:    mov x8, xzr
+; CHECK-IADISABLED-NEXT:    mov w8, #1024 // =0x400
 ; CHECK-IADISABLED-NEXT:  .LBB23_1: // %vector.body
 ; CHECK-IADISABLED-NEXT:    // =>This Inner Loop Header: Depth=1
 ; CHECK-IADISABLED-NEXT:    ld4 { v0.4s, v1.4s, v2.4s, v3.4s }, [x0], #64
-; CHECK-IADISABLED-NEXT:    add x9, x1, x8
-; CHECK-IADISABLED-NEXT:    add x8, x8, #32
-; CHECK-IADISABLED-NEXT:    cmp x8, #2, lsl #12 // =8192
+; CHECK-IADISABLED-NEXT:    subs x8, x8, #4
 ; CHECK-IADISABLED-NEXT:    fmul v4.4s, v0.4s, v0.4s
 ; CHECK-IADISABLED-NEXT:    fmul v5.4s, v2.4s, v2.4s
 ; CHECK-IADISABLED-NEXT:    fmla v4.4s, v1.4s, v1.4s
 ; CHECK-IADISABLED-NEXT:    fmla v5.4s, v3.4s, v3.4s
 ; CHECK-IADISABLED-NEXT:    zip2 v0.4s, v4.4s, v5.4s
 ; CHECK-IADISABLED-NEXT:    zip1 v1.4s, v4.4s, v5.4s
-; CHECK-IADISABLED-NEXT:    stp q1, q0, [x9]
+; CHECK-IADISABLED-NEXT:    stp q1, q0, [x1], #32
 ; CHECK-IADISABLED-NEXT:    b.ne .LBB23_1
 ; CHECK-IADISABLED-NEXT:  // %bb.2: // %while.end
 ; CHECK-IADISABLED-NEXT:    ret

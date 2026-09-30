@@ -98,11 +98,11 @@ define void @uses_cmp_fn(ptr %dst, i64 %n) {
 ; CHECK-NEXT:  [[ENTRY:.*]]:
 ; CHECK-NEXT:    br label %[[LOOP:.*]]
 ; CHECK:       [[LOOP]]:
+; CHECK-NEXT:    [[LSR_IV1:%.*]] = phi ptr [ [[SCEVGEP:%.*]], %[[LOOP]] ], [ [[DST]], %[[ENTRY]] ]
 ; CHECK-NEXT:    [[LSR_IV:%.*]] = phi i64 [ 0, %[[ENTRY]] ], [ [[LSR_IV_NEXT:%.*]], %[[LOOP]] ]
-; CHECK-NEXT:    [[TMP0:%.*]] = shl i64 [[LSR_IV]], 2
-; CHECK-NEXT:    [[LSR_IV1:%.*]] = getelementptr i8, ptr [[DST]], i64 [[TMP0]]
 ; CHECK-NEXT:    store i32 0, ptr [[LSR_IV1]], align 4
 ; CHECK-NEXT:    [[LSR_IV_NEXT]] = add i64 [[LSR_IV]], 1
+; CHECK-NEXT:    [[SCEVGEP]] = getelementptr i8, ptr [[LSR_IV1]], i64 4
 ; CHECK-NEXT:    [[COND:%.*]] = tail call i1 @cmp_fn(i64 [[LSR_IV_NEXT]])
 ; CHECK-NEXT:    br i1 [[COND]], label %[[LOOP]], label %[[EXIT:.*]]
 ; CHECK:       [[EXIT]]:
@@ -131,10 +131,10 @@ define void @uses_cmp_fn_not_last(ptr %dst, i64 %n) {
 ; CHECK-NEXT:  [[ENTRY:.*]]:
 ; CHECK-NEXT:    br label %[[LOOP:.*]]
 ; CHECK:       [[LOOP]]:
+; CHECK-NEXT:    [[LSR_IV1:%.*]] = phi ptr [ [[SCEVGEP:%.*]], %[[LOOP]] ], [ [[DST]], %[[ENTRY]] ]
 ; CHECK-NEXT:    [[IV:%.*]] = phi i64 [ 0, %[[ENTRY]] ], [ [[LSR_IV:%.*]], %[[LOOP]] ]
-; CHECK-NEXT:    [[TMP0:%.*]] = shl i64 [[IV]], 2
-; CHECK-NEXT:    [[LSR_IV1:%.*]] = getelementptr i8, ptr [[DST]], i64 [[TMP0]]
 ; CHECK-NEXT:    [[LSR_IV]] = add i64 [[IV]], 1
+; CHECK-NEXT:    [[SCEVGEP]] = getelementptr i8, ptr [[LSR_IV1]], i64 4
 ; CHECK-NEXT:    [[COND:%.*]] = tail call i1 @cmp_fn(i64 [[LSR_IV]])
 ; CHECK-NEXT:    store i32 0, ptr [[LSR_IV1]], align 4
 ; CHECK-NEXT:    br i1 [[COND]], label %[[LOOP]], label %[[EXIT:.*]]

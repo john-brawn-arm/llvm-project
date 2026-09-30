@@ -16,15 +16,12 @@ define dso_local %"struct.std::complex" @complex_mul_v2f64(ptr %a, ptr %b) {
 ; CHECK:       // %bb.0: // %entry
 ; CHECK-NEXT:    movi v0.2d, #0000000000000000
 ; CHECK-NEXT:    movi v1.2d, #0000000000000000
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1600 // =0x640
 ; CHECK-NEXT:  .LBB0_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    add x9, x0, x8
-; CHECK-NEXT:    add x10, x1, x8
-; CHECK-NEXT:    add x8, x8, #32
-; CHECK-NEXT:    ldp q3, q2, [x9]
-; CHECK-NEXT:    cmp x8, #1600
-; CHECK-NEXT:    ldp q5, q4, [x10]
+; CHECK-NEXT:    ldp q3, q2, [x0], #32
+; CHECK-NEXT:    ldp q5, q4, [x1], #32
+; CHECK-NEXT:    subs x8, x8, #32
 ; CHECK-NEXT:    fcmla v1.2d, v5.2d, v3.2d, #0
 ; CHECK-NEXT:    fcmla v0.2d, v4.2d, v2.2d, #0
 ; CHECK-NEXT:    fcmla v1.2d, v5.2d, v3.2d, #90
@@ -83,15 +80,12 @@ define %"struct.std::complex" @complex_mul_nonzero_init_v2f64(ptr %a, ptr %b) {
 ; CHECK-NEXT:    movi v0.2d, #0000000000000000
 ; CHECK-NEXT:    adrp x8, .LCPI1_0
 ; CHECK-NEXT:    ldr q1, [x8, :lo12:.LCPI1_0]
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1600 // =0x640
 ; CHECK-NEXT:  .LBB1_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    add x9, x0, x8
-; CHECK-NEXT:    add x10, x1, x8
-; CHECK-NEXT:    add x8, x8, #32
-; CHECK-NEXT:    ldp q3, q2, [x9]
-; CHECK-NEXT:    cmp x8, #1600
-; CHECK-NEXT:    ldp q5, q4, [x10]
+; CHECK-NEXT:    ldp q3, q2, [x0], #32
+; CHECK-NEXT:    ldp q5, q4, [x1], #32
+; CHECK-NEXT:    subs x8, x8, #32
 ; CHECK-NEXT:    fcmla v1.2d, v5.2d, v3.2d, #0
 ; CHECK-NEXT:    fcmla v0.2d, v4.2d, v2.2d, #0
 ; CHECK-NEXT:    fcmla v1.2d, v5.2d, v3.2d, #90
@@ -145,24 +139,19 @@ define %"struct.std::complex" @complex_mul_v2f64_unrolled(ptr %a, ptr %b) {
 ; CHECK:       // %bb.0: // %entry
 ; CHECK-NEXT:    movi v0.2d, #0000000000000000
 ; CHECK-NEXT:    movi v1.2d, #0000000000000000
-; CHECK-NEXT:    adrp x9, .LCPI2_0
+; CHECK-NEXT:    adrp x8, .LCPI2_0
 ; CHECK-NEXT:    movi v3.2d, #0000000000000000
-; CHECK-NEXT:    ldr q2, [x9, :lo12:.LCPI2_0]
-; CHECK-NEXT:    mov x8, xzr
-; CHECK-NEXT:    add x9, x0, #32
-; CHECK-NEXT:    add x10, x1, #32
+; CHECK-NEXT:    ldr q2, [x8, :lo12:.LCPI2_0]
+; CHECK-NEXT:    add x8, x0, #32
+; CHECK-NEXT:    add x9, x1, #32
+; CHECK-NEXT:    mov x10, #-100 // =0xffffffffffffff9c
 ; CHECK-NEXT:  .LBB2_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    add x11, x10, x8
-; CHECK-NEXT:    add x12, x9, x8
-; CHECK-NEXT:    add x13, x0, x8
-; CHECK-NEXT:    add x14, x1, x8
-; CHECK-NEXT:    ldp q5, q4, [x13]
-; CHECK-NEXT:    ldp q7, q6, [x14]
-; CHECK-NEXT:    add x8, x8, #64
-; CHECK-NEXT:    ldp q17, q16, [x12]
-; CHECK-NEXT:    cmp x8, #1600
-; CHECK-NEXT:    ldp q19, q18, [x11]
+; CHECK-NEXT:    ldp q5, q4, [x8, #-32]
+; CHECK-NEXT:    adds x10, x10, #4
+; CHECK-NEXT:    ldp q7, q6, [x9, #-32]
+; CHECK-NEXT:    ldp q17, q16, [x8], #64
+; CHECK-NEXT:    ldp q19, q18, [x9], #64
 ; CHECK-NEXT:    fcmla v2.2d, v7.2d, v5.2d, #0
 ; CHECK-NEXT:    fcmla v1.2d, v6.2d, v4.2d, #0
 ; CHECK-NEXT:    fcmla v0.2d, v19.2d, v17.2d, #0

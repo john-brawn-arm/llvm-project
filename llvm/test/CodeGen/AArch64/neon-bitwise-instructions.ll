@@ -3376,14 +3376,13 @@ define <2 x i64> @or_dup_not_v2i64(<2 x i64> %a, i64 %m) {
 define void @array_and_not_v16i8(ptr %a, <16 x i8> %m) {
 ; CHECK-LABEL: array_and_not_v16i8:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:  .LBB211_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
+; CHECK-NEXT:    ldr q1, [x0]
+; CHECK-NEXT:    subs x8, x8, #16
 ; CHECK-NEXT:    bic v1.16b, v1.16b, v0.16b
-; CHECK-NEXT:    str q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #256
+; CHECK-NEXT:    str q1, [x0], #16
 ; CHECK-NEXT:    b.ne .LBB211_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -3408,14 +3407,13 @@ for.cond.cleanup:
 define void @array_and_not_v8i16(ptr %a, <8 x i16> %m) {
 ; CHECK-LABEL: array_and_not_v8i16:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:  .LBB212_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
+; CHECK-NEXT:    ldr q1, [x0]
+; CHECK-NEXT:    subs x8, x8, #8
 ; CHECK-NEXT:    bic v1.16b, v1.16b, v0.16b
-; CHECK-NEXT:    str q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #512
+; CHECK-NEXT:    str q1, [x0], #16
 ; CHECK-NEXT:    b.ne .LBB212_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -3440,14 +3438,13 @@ for.cond.cleanup:
 define void @array_and_not_v4i32(ptr %a, <4 x i32> %m) {
 ; CHECK-LABEL: array_and_not_v4i32:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:  .LBB213_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
+; CHECK-NEXT:    ldr q1, [x0]
+; CHECK-NEXT:    subs x8, x8, #4
 ; CHECK-NEXT:    bic v1.16b, v1.16b, v0.16b
-; CHECK-NEXT:    str q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #1024
+; CHECK-NEXT:    str q1, [x0], #16
 ; CHECK-NEXT:    b.ne .LBB213_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -3472,14 +3469,13 @@ for.cond.cleanup:
 define void @array_and_not_v2i64(ptr %a, <2 x i64> %m) {
 ; CHECK-LABEL: array_and_not_v2i64:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:  .LBB214_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
+; CHECK-NEXT:    ldr q1, [x0]
+; CHECK-NEXT:    subs x8, x8, #2
 ; CHECK-NEXT:    bic v1.16b, v1.16b, v0.16b
-; CHECK-NEXT:    str q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #2048
+; CHECK-NEXT:    str q1, [x0], #16
 ; CHECK-NEXT:    b.ne .LBB214_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -3504,14 +3500,13 @@ for.cond.cleanup:
 define void @array_or_not_v16i8(ptr %a, <16 x i8> %m) {
 ; CHECK-LABEL: array_or_not_v16i8:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:  .LBB215_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
+; CHECK-NEXT:    ldr q1, [x0]
+; CHECK-NEXT:    subs x8, x8, #16
 ; CHECK-NEXT:    orn v1.16b, v1.16b, v0.16b
-; CHECK-NEXT:    str q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #256
+; CHECK-NEXT:    str q1, [x0], #16
 ; CHECK-NEXT:    b.ne .LBB215_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -3536,14 +3531,13 @@ for.cond.cleanup:
 define void @array_or_not_v8i16(ptr %a, <8 x i16> %m) {
 ; CHECK-LABEL: array_or_not_v8i16:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:  .LBB216_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
+; CHECK-NEXT:    ldr q1, [x0]
+; CHECK-NEXT:    subs x8, x8, #8
 ; CHECK-NEXT:    orn v1.16b, v1.16b, v0.16b
-; CHECK-NEXT:    str q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #512
+; CHECK-NEXT:    str q1, [x0], #16
 ; CHECK-NEXT:    b.ne .LBB216_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -3568,14 +3562,13 @@ for.cond.cleanup:
 define void @array_or_not_v4i32(ptr %a, <4 x i32> %m) {
 ; CHECK-LABEL: array_or_not_v4i32:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:  .LBB217_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
+; CHECK-NEXT:    ldr q1, [x0]
+; CHECK-NEXT:    subs x8, x8, #4
 ; CHECK-NEXT:    orn v1.16b, v1.16b, v0.16b
-; CHECK-NEXT:    str q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #1024
+; CHECK-NEXT:    str q1, [x0], #16
 ; CHECK-NEXT:    b.ne .LBB217_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -3600,14 +3593,13 @@ for.cond.cleanup:
 define void @array_or_not_v2i64(ptr %a, <2 x i64> %m) {
 ; CHECK-LABEL: array_or_not_v2i64:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #256 // =0x100
 ; CHECK-NEXT:  .LBB218_1: // %vector.body
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
+; CHECK-NEXT:    ldr q1, [x0]
+; CHECK-NEXT:    subs x8, x8, #2
 ; CHECK-NEXT:    orn v1.16b, v1.16b, v0.16b
-; CHECK-NEXT:    str q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp x8, #2048
+; CHECK-NEXT:    str q1, [x0], #16
 ; CHECK-NEXT:    b.ne .LBB218_1
 ; CHECK-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-NEXT:    ret
@@ -3633,14 +3625,13 @@ define void @array_and_not_dup_v16i8(ptr %a, i8 %m) {
 ; CHECK-SD-LABEL: array_and_not_dup_v16i8:
 ; CHECK-SD:       // %bb.0: // %entry
 ; CHECK-SD-NEXT:    dup v0.16b, w1
-; CHECK-SD-NEXT:    mov x8, xzr
+; CHECK-SD-NEXT:    mov w8, #256 // =0x100
 ; CHECK-SD-NEXT:  .LBB219_1: // %vector.body
 ; CHECK-SD-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NEXT:    ldr q1, [x0]
+; CHECK-SD-NEXT:    subs x8, x8, #16
 ; CHECK-SD-NEXT:    bic v1.16b, v1.16b, v0.16b
-; CHECK-SD-NEXT:    str q1, [x0, x8]
-; CHECK-SD-NEXT:    add x8, x8, #16
-; CHECK-SD-NEXT:    cmp x8, #256
+; CHECK-SD-NEXT:    str q1, [x0], #16
 ; CHECK-SD-NEXT:    b.ne .LBB219_1
 ; CHECK-SD-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-SD-NEXT:    ret
@@ -3649,14 +3640,13 @@ define void @array_and_not_dup_v16i8(ptr %a, i8 %m) {
 ; CHECK-GI:       // %bb.0: // %entry
 ; CHECK-GI-NEXT:    mvn w8, w1
 ; CHECK-GI-NEXT:    dup v0.16b, w8
-; CHECK-GI-NEXT:    mov x8, xzr
+; CHECK-GI-NEXT:    mov w8, #256 // =0x100
 ; CHECK-GI-NEXT:  .LBB219_1: // %vector.body
 ; CHECK-GI-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NEXT:    ldr q1, [x0]
+; CHECK-GI-NEXT:    subs x8, x8, #16
 ; CHECK-GI-NEXT:    and v1.16b, v1.16b, v0.16b
-; CHECK-GI-NEXT:    str q1, [x0, x8]
-; CHECK-GI-NEXT:    add x8, x8, #16
-; CHECK-GI-NEXT:    cmp x8, #256
+; CHECK-GI-NEXT:    str q1, [x0], #16
 ; CHECK-GI-NEXT:    b.ne .LBB219_1
 ; CHECK-GI-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-GI-NEXT:    ret
@@ -3684,14 +3674,13 @@ define void @array_and_not_dup_v8i16(ptr %a, i16 %m) {
 ; CHECK-SD-LABEL: array_and_not_dup_v8i16:
 ; CHECK-SD:       // %bb.0: // %entry
 ; CHECK-SD-NEXT:    dup v0.8h, w1
-; CHECK-SD-NEXT:    mov x8, xzr
+; CHECK-SD-NEXT:    mov w8, #256 // =0x100
 ; CHECK-SD-NEXT:  .LBB220_1: // %vector.body
 ; CHECK-SD-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NEXT:    ldr q1, [x0]
+; CHECK-SD-NEXT:    subs x8, x8, #8
 ; CHECK-SD-NEXT:    bic v1.16b, v1.16b, v0.16b
-; CHECK-SD-NEXT:    str q1, [x0, x8]
-; CHECK-SD-NEXT:    add x8, x8, #16
-; CHECK-SD-NEXT:    cmp x8, #512
+; CHECK-SD-NEXT:    str q1, [x0], #16
 ; CHECK-SD-NEXT:    b.ne .LBB220_1
 ; CHECK-SD-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-SD-NEXT:    ret
@@ -3700,14 +3689,13 @@ define void @array_and_not_dup_v8i16(ptr %a, i16 %m) {
 ; CHECK-GI:       // %bb.0: // %entry
 ; CHECK-GI-NEXT:    mvn w8, w1
 ; CHECK-GI-NEXT:    dup v0.8h, w8
-; CHECK-GI-NEXT:    mov x8, xzr
+; CHECK-GI-NEXT:    mov w8, #256 // =0x100
 ; CHECK-GI-NEXT:  .LBB220_1: // %vector.body
 ; CHECK-GI-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NEXT:    ldr q1, [x0]
+; CHECK-GI-NEXT:    subs x8, x8, #8
 ; CHECK-GI-NEXT:    and v1.16b, v1.16b, v0.16b
-; CHECK-GI-NEXT:    str q1, [x0, x8]
-; CHECK-GI-NEXT:    add x8, x8, #16
-; CHECK-GI-NEXT:    cmp x8, #512
+; CHECK-GI-NEXT:    str q1, [x0], #16
 ; CHECK-GI-NEXT:    b.ne .LBB220_1
 ; CHECK-GI-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-GI-NEXT:    ret
@@ -3735,14 +3723,13 @@ define void @array_and_not_dup_v4i32(ptr %a, i32 %m) {
 ; CHECK-SD-LABEL: array_and_not_dup_v4i32:
 ; CHECK-SD:       // %bb.0: // %entry
 ; CHECK-SD-NEXT:    dup v0.4s, w1
-; CHECK-SD-NEXT:    mov x8, xzr
+; CHECK-SD-NEXT:    mov w8, #256 // =0x100
 ; CHECK-SD-NEXT:  .LBB221_1: // %vector.body
 ; CHECK-SD-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NEXT:    ldr q1, [x0]
+; CHECK-SD-NEXT:    subs x8, x8, #4
 ; CHECK-SD-NEXT:    bic v1.16b, v1.16b, v0.16b
-; CHECK-SD-NEXT:    str q1, [x0, x8]
-; CHECK-SD-NEXT:    add x8, x8, #16
-; CHECK-SD-NEXT:    cmp x8, #1024
+; CHECK-SD-NEXT:    str q1, [x0], #16
 ; CHECK-SD-NEXT:    b.ne .LBB221_1
 ; CHECK-SD-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-SD-NEXT:    ret
@@ -3751,14 +3738,13 @@ define void @array_and_not_dup_v4i32(ptr %a, i32 %m) {
 ; CHECK-GI:       // %bb.0: // %entry
 ; CHECK-GI-NEXT:    mvn w8, w1
 ; CHECK-GI-NEXT:    dup v0.4s, w8
-; CHECK-GI-NEXT:    mov x8, xzr
+; CHECK-GI-NEXT:    mov w8, #256 // =0x100
 ; CHECK-GI-NEXT:  .LBB221_1: // %vector.body
 ; CHECK-GI-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NEXT:    ldr q1, [x0]
+; CHECK-GI-NEXT:    subs x8, x8, #4
 ; CHECK-GI-NEXT:    and v1.16b, v1.16b, v0.16b
-; CHECK-GI-NEXT:    str q1, [x0, x8]
-; CHECK-GI-NEXT:    add x8, x8, #16
-; CHECK-GI-NEXT:    cmp x8, #1024
+; CHECK-GI-NEXT:    str q1, [x0], #16
 ; CHECK-GI-NEXT:    b.ne .LBB221_1
 ; CHECK-GI-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-GI-NEXT:    ret
@@ -3786,14 +3772,13 @@ define void @array_and_not_dup_v2i64(ptr %a, i64 %m) {
 ; CHECK-SD-LABEL: array_and_not_dup_v2i64:
 ; CHECK-SD:       // %bb.0: // %entry
 ; CHECK-SD-NEXT:    dup v0.2d, x1
-; CHECK-SD-NEXT:    mov x8, xzr
+; CHECK-SD-NEXT:    mov w8, #256 // =0x100
 ; CHECK-SD-NEXT:  .LBB222_1: // %vector.body
 ; CHECK-SD-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NEXT:    ldr q1, [x0]
+; CHECK-SD-NEXT:    subs x8, x8, #2
 ; CHECK-SD-NEXT:    bic v1.16b, v1.16b, v0.16b
-; CHECK-SD-NEXT:    str q1, [x0, x8]
-; CHECK-SD-NEXT:    add x8, x8, #16
-; CHECK-SD-NEXT:    cmp x8, #2048
+; CHECK-SD-NEXT:    str q1, [x0], #16
 ; CHECK-SD-NEXT:    b.ne .LBB222_1
 ; CHECK-SD-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-SD-NEXT:    ret
@@ -3802,14 +3787,13 @@ define void @array_and_not_dup_v2i64(ptr %a, i64 %m) {
 ; CHECK-GI:       // %bb.0: // %entry
 ; CHECK-GI-NEXT:    mvn x8, x1
 ; CHECK-GI-NEXT:    dup v0.2d, x8
-; CHECK-GI-NEXT:    mov x8, xzr
+; CHECK-GI-NEXT:    mov w8, #256 // =0x100
 ; CHECK-GI-NEXT:  .LBB222_1: // %vector.body
 ; CHECK-GI-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NEXT:    ldr q1, [x0]
+; CHECK-GI-NEXT:    subs x8, x8, #2
 ; CHECK-GI-NEXT:    and v1.16b, v1.16b, v0.16b
-; CHECK-GI-NEXT:    str q1, [x0, x8]
-; CHECK-GI-NEXT:    add x8, x8, #16
-; CHECK-GI-NEXT:    cmp x8, #2048
+; CHECK-GI-NEXT:    str q1, [x0], #16
 ; CHECK-GI-NEXT:    b.ne .LBB222_1
 ; CHECK-GI-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-GI-NEXT:    ret
@@ -3837,14 +3821,13 @@ define void @array_or_not_dup_v16i8(ptr %a, i8 %m) {
 ; CHECK-SD-LABEL: array_or_not_dup_v16i8:
 ; CHECK-SD:       // %bb.0: // %entry
 ; CHECK-SD-NEXT:    dup v0.16b, w1
-; CHECK-SD-NEXT:    mov x8, xzr
+; CHECK-SD-NEXT:    mov w8, #256 // =0x100
 ; CHECK-SD-NEXT:  .LBB223_1: // %vector.body
 ; CHECK-SD-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NEXT:    ldr q1, [x0]
+; CHECK-SD-NEXT:    subs x8, x8, #16
 ; CHECK-SD-NEXT:    orn v1.16b, v1.16b, v0.16b
-; CHECK-SD-NEXT:    str q1, [x0, x8]
-; CHECK-SD-NEXT:    add x8, x8, #16
-; CHECK-SD-NEXT:    cmp x8, #256
+; CHECK-SD-NEXT:    str q1, [x0], #16
 ; CHECK-SD-NEXT:    b.ne .LBB223_1
 ; CHECK-SD-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-SD-NEXT:    ret
@@ -3853,14 +3836,13 @@ define void @array_or_not_dup_v16i8(ptr %a, i8 %m) {
 ; CHECK-GI:       // %bb.0: // %entry
 ; CHECK-GI-NEXT:    mvn w8, w1
 ; CHECK-GI-NEXT:    dup v0.16b, w8
-; CHECK-GI-NEXT:    mov x8, xzr
+; CHECK-GI-NEXT:    mov w8, #256 // =0x100
 ; CHECK-GI-NEXT:  .LBB223_1: // %vector.body
 ; CHECK-GI-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NEXT:    ldr q1, [x0]
+; CHECK-GI-NEXT:    subs x8, x8, #16
 ; CHECK-GI-NEXT:    orr v1.16b, v1.16b, v0.16b
-; CHECK-GI-NEXT:    str q1, [x0, x8]
-; CHECK-GI-NEXT:    add x8, x8, #16
-; CHECK-GI-NEXT:    cmp x8, #256
+; CHECK-GI-NEXT:    str q1, [x0], #16
 ; CHECK-GI-NEXT:    b.ne .LBB223_1
 ; CHECK-GI-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-GI-NEXT:    ret
@@ -3888,14 +3870,13 @@ define void @array_or_not_dup_v8i16(ptr %a, i16 %m) {
 ; CHECK-SD-LABEL: array_or_not_dup_v8i16:
 ; CHECK-SD:       // %bb.0: // %entry
 ; CHECK-SD-NEXT:    dup v0.8h, w1
-; CHECK-SD-NEXT:    mov x8, xzr
+; CHECK-SD-NEXT:    mov w8, #256 // =0x100
 ; CHECK-SD-NEXT:  .LBB224_1: // %vector.body
 ; CHECK-SD-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NEXT:    ldr q1, [x0]
+; CHECK-SD-NEXT:    subs x8, x8, #8
 ; CHECK-SD-NEXT:    orn v1.16b, v1.16b, v0.16b
-; CHECK-SD-NEXT:    str q1, [x0, x8]
-; CHECK-SD-NEXT:    add x8, x8, #16
-; CHECK-SD-NEXT:    cmp x8, #512
+; CHECK-SD-NEXT:    str q1, [x0], #16
 ; CHECK-SD-NEXT:    b.ne .LBB224_1
 ; CHECK-SD-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-SD-NEXT:    ret
@@ -3904,14 +3885,13 @@ define void @array_or_not_dup_v8i16(ptr %a, i16 %m) {
 ; CHECK-GI:       // %bb.0: // %entry
 ; CHECK-GI-NEXT:    mvn w8, w1
 ; CHECK-GI-NEXT:    dup v0.8h, w8
-; CHECK-GI-NEXT:    mov x8, xzr
+; CHECK-GI-NEXT:    mov w8, #256 // =0x100
 ; CHECK-GI-NEXT:  .LBB224_1: // %vector.body
 ; CHECK-GI-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NEXT:    ldr q1, [x0]
+; CHECK-GI-NEXT:    subs x8, x8, #8
 ; CHECK-GI-NEXT:    orr v1.16b, v1.16b, v0.16b
-; CHECK-GI-NEXT:    str q1, [x0, x8]
-; CHECK-GI-NEXT:    add x8, x8, #16
-; CHECK-GI-NEXT:    cmp x8, #512
+; CHECK-GI-NEXT:    str q1, [x0], #16
 ; CHECK-GI-NEXT:    b.ne .LBB224_1
 ; CHECK-GI-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-GI-NEXT:    ret
@@ -3939,14 +3919,13 @@ define void @array_or_not_dup_v4i32(ptr %a, i32 %m) {
 ; CHECK-SD-LABEL: array_or_not_dup_v4i32:
 ; CHECK-SD:       // %bb.0: // %entry
 ; CHECK-SD-NEXT:    dup v0.4s, w1
-; CHECK-SD-NEXT:    mov x8, xzr
+; CHECK-SD-NEXT:    mov w8, #256 // =0x100
 ; CHECK-SD-NEXT:  .LBB225_1: // %vector.body
 ; CHECK-SD-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NEXT:    ldr q1, [x0]
+; CHECK-SD-NEXT:    subs x8, x8, #4
 ; CHECK-SD-NEXT:    orn v1.16b, v1.16b, v0.16b
-; CHECK-SD-NEXT:    str q1, [x0, x8]
-; CHECK-SD-NEXT:    add x8, x8, #16
-; CHECK-SD-NEXT:    cmp x8, #1024
+; CHECK-SD-NEXT:    str q1, [x0], #16
 ; CHECK-SD-NEXT:    b.ne .LBB225_1
 ; CHECK-SD-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-SD-NEXT:    ret
@@ -3955,14 +3934,13 @@ define void @array_or_not_dup_v4i32(ptr %a, i32 %m) {
 ; CHECK-GI:       // %bb.0: // %entry
 ; CHECK-GI-NEXT:    mvn w8, w1
 ; CHECK-GI-NEXT:    dup v0.4s, w8
-; CHECK-GI-NEXT:    mov x8, xzr
+; CHECK-GI-NEXT:    mov w8, #256 // =0x100
 ; CHECK-GI-NEXT:  .LBB225_1: // %vector.body
 ; CHECK-GI-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NEXT:    ldr q1, [x0]
+; CHECK-GI-NEXT:    subs x8, x8, #4
 ; CHECK-GI-NEXT:    orr v1.16b, v1.16b, v0.16b
-; CHECK-GI-NEXT:    str q1, [x0, x8]
-; CHECK-GI-NEXT:    add x8, x8, #16
-; CHECK-GI-NEXT:    cmp x8, #1024
+; CHECK-GI-NEXT:    str q1, [x0], #16
 ; CHECK-GI-NEXT:    b.ne .LBB225_1
 ; CHECK-GI-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-GI-NEXT:    ret
@@ -3990,14 +3968,13 @@ define void @array_or_not_dup_v2i64(ptr %a, i64 %m) {
 ; CHECK-SD-LABEL: array_or_not_dup_v2i64:
 ; CHECK-SD:       // %bb.0: // %entry
 ; CHECK-SD-NEXT:    dup v0.2d, x1
-; CHECK-SD-NEXT:    mov x8, xzr
+; CHECK-SD-NEXT:    mov w8, #256 // =0x100
 ; CHECK-SD-NEXT:  .LBB226_1: // %vector.body
 ; CHECK-SD-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NEXT:    ldr q1, [x0]
+; CHECK-SD-NEXT:    subs x8, x8, #2
 ; CHECK-SD-NEXT:    orn v1.16b, v1.16b, v0.16b
-; CHECK-SD-NEXT:    str q1, [x0, x8]
-; CHECK-SD-NEXT:    add x8, x8, #16
-; CHECK-SD-NEXT:    cmp x8, #2048
+; CHECK-SD-NEXT:    str q1, [x0], #16
 ; CHECK-SD-NEXT:    b.ne .LBB226_1
 ; CHECK-SD-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-SD-NEXT:    ret
@@ -4006,14 +3983,13 @@ define void @array_or_not_dup_v2i64(ptr %a, i64 %m) {
 ; CHECK-GI:       // %bb.0: // %entry
 ; CHECK-GI-NEXT:    mvn x8, x1
 ; CHECK-GI-NEXT:    dup v0.2d, x8
-; CHECK-GI-NEXT:    mov x8, xzr
+; CHECK-GI-NEXT:    mov w8, #256 // =0x100
 ; CHECK-GI-NEXT:  .LBB226_1: // %vector.body
 ; CHECK-GI-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NEXT:    ldr q1, [x0]
+; CHECK-GI-NEXT:    subs x8, x8, #2
 ; CHECK-GI-NEXT:    orr v1.16b, v1.16b, v0.16b
-; CHECK-GI-NEXT:    str q1, [x0, x8]
-; CHECK-GI-NEXT:    add x8, x8, #16
-; CHECK-GI-NEXT:    cmp x8, #2048
+; CHECK-GI-NEXT:    str q1, [x0], #16
 ; CHECK-GI-NEXT:    b.ne .LBB226_1
 ; CHECK-GI-NEXT:  // %bb.2: // %for.cond.cleanup
 ; CHECK-GI-NEXT:    ret

@@ -203,22 +203,21 @@ for.exit:
 define void @mixed_offsets_fixed_then_scalable(ptr %src, ptr %dst, i64 %count) #0 {
 ; DEFAULT-LABEL: mixed_offsets_fixed_then_scalable:
 ; DEFAULT:       // %bb.0: // %entry
-; DEFAULT-NEXT:    rdvl x8, #4
-; DEFAULT-NEXT:    ptrue p0.b
-; DEFAULT-NEXT:    mov x9, #8 // =0x8
-; DEFAULT-NEXT:    orr x8, x8, #0x20
+; DEFAULT-NEXT:    ptrue p0.s
+; DEFAULT-NEXT:    mov x8, xzr
+; DEFAULT-NEXT:    add x9, x0, #32
 ; DEFAULT-NEXT:  .LBB4_1: // %for.body
 ; DEFAULT-NEXT:    // =>This Inner Loop Header: Depth=1
-; DEFAULT-NEXT:    ldr z0, [x0]
-; DEFAULT-NEXT:    ld1w { z1.s }, p0/z, [x0, x9, lsl #2]
-; DEFAULT-NEXT:    decw x2
-; DEFAULT-NEXT:    ld1b { z2.b }, p0/z, [x0, x8]
-; DEFAULT-NEXT:    incb x0
+; DEFAULT-NEXT:    ldr z0, [x9]
+; DEFAULT-NEXT:    ldr z1, [x9, #4, mul vl]
+; DEFAULT-NEXT:    incb x9
+; DEFAULT-NEXT:    ld1w { z2.s }, p0/z, [x0, x8, lsl #2]
 ; DEFAULT-NEXT:    add z0.s, z0.s, z1.s
-; DEFAULT-NEXT:    add z0.s, z0.s, z2.s
-; DEFAULT-NEXT:    str z0, [x1]
-; DEFAULT-NEXT:    incb x1
-; DEFAULT-NEXT:    cbnz x2, .LBB4_1
+; DEFAULT-NEXT:    add z0.s, z2.s, z0.s
+; DEFAULT-NEXT:    st1w { z0.s }, p0, [x1, x8, lsl #2]
+; DEFAULT-NEXT:    incw x8
+; DEFAULT-NEXT:    cmp x2, x8
+; DEFAULT-NEXT:    b.ne .LBB4_1
 ; DEFAULT-NEXT:  // %bb.2: // %for.exit
 ; DEFAULT-NEXT:    ret
 ;

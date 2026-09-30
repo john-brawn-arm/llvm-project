@@ -291,12 +291,11 @@ define float @fadd_reduction_v4f32_in_loop(ptr %ptr.start) {
 ; CHECK-LABEL: fadd_reduction_v4f32_in_loop:
 ; CHECK:       // %bb.0: // %entry
 ; CHECK-NEXT:    movi d0, #0000000000000000
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #7 // =0x7
 ; CHECK-NEXT:  .LBB12_1: // %loop
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q1, [x0, x8]
-; CHECK-NEXT:    add x8, x8, #16
-; CHECK-NEXT:    cmp w8, #112
+; CHECK-NEXT:    ldr q1, [x0], #16
+; CHECK-NEXT:    subs w8, w8, #1
 ; CHECK-NEXT:    faddp v1.4s, v1.4s, v1.4s
 ; CHECK-NEXT:    faddp s1, v1.2s
 ; CHECK-NEXT:    fadd s0, s1, s0
@@ -328,13 +327,12 @@ define half @fadd_reduction_v4f16_in_loop(ptr %ptr.start) {
 ; CHECK-SD-NOFP16-LABEL: fadd_reduction_v4f16_in_loop:
 ; CHECK-SD-NOFP16:       // %bb.0: // %entry
 ; CHECK-SD-NOFP16-NEXT:    movi d0, #0000000000000000
-; CHECK-SD-NOFP16-NEXT:    mov x8, xzr
+; CHECK-SD-NOFP16-NEXT:    mov w8, #7 // =0x7
 ; CHECK-SD-NOFP16-NEXT:  .LBB13_1: // %loop
 ; CHECK-SD-NOFP16-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NOFP16-NEXT:    ldr d1, [x0, x8]
+; CHECK-SD-NOFP16-NEXT:    ldr d1, [x0], #8
 ; CHECK-SD-NOFP16-NEXT:    fcvt s0, h0
-; CHECK-SD-NOFP16-NEXT:    add x8, x8, #8
-; CHECK-SD-NOFP16-NEXT:    cmp w8, #56
+; CHECK-SD-NOFP16-NEXT:    subs w8, w8, #1
 ; CHECK-SD-NOFP16-NEXT:    mov h2, v1.h[1]
 ; CHECK-SD-NOFP16-NEXT:    mov h3, v1.h[3]
 ; CHECK-SD-NOFP16-NEXT:    mov h4, v1.h[2]
@@ -354,12 +352,11 @@ define half @fadd_reduction_v4f16_in_loop(ptr %ptr.start) {
 ; CHECK-SD-FP16-LABEL: fadd_reduction_v4f16_in_loop:
 ; CHECK-SD-FP16:       // %bb.0: // %entry
 ; CHECK-SD-FP16-NEXT:    movi d0, #0000000000000000
-; CHECK-SD-FP16-NEXT:    mov x8, xzr
+; CHECK-SD-FP16-NEXT:    mov w8, #7 // =0x7
 ; CHECK-SD-FP16-NEXT:  .LBB13_1: // %loop
 ; CHECK-SD-FP16-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-FP16-NEXT:    ldr d1, [x0, x8]
-; CHECK-SD-FP16-NEXT:    add x8, x8, #8
-; CHECK-SD-FP16-NEXT:    cmp w8, #56
+; CHECK-SD-FP16-NEXT:    ldr d1, [x0], #8
+; CHECK-SD-FP16-NEXT:    subs w8, w8, #1
 ; CHECK-SD-FP16-NEXT:    faddp v1.4h, v1.4h, v1.4h
 ; CHECK-SD-FP16-NEXT:    faddp h1, v1.2h
 ; CHECK-SD-FP16-NEXT:    fadd h0, h1, h0
@@ -370,13 +367,12 @@ define half @fadd_reduction_v4f16_in_loop(ptr %ptr.start) {
 ; CHECK-GI-NOFP16-LABEL: fadd_reduction_v4f16_in_loop:
 ; CHECK-GI-NOFP16:       // %bb.0: // %entry
 ; CHECK-GI-NOFP16-NEXT:    movi d0, #0000000000000000
-; CHECK-GI-NOFP16-NEXT:    mov x8, xzr
+; CHECK-GI-NOFP16-NEXT:    mov w8, #7 // =0x7
 ; CHECK-GI-NOFP16-NEXT:  .LBB13_1: // %loop
 ; CHECK-GI-NOFP16-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NOFP16-NEXT:    ldr d1, [x0, x8]
+; CHECK-GI-NOFP16-NEXT:    ldr d1, [x0], #8
 ; CHECK-GI-NOFP16-NEXT:    fcvt s0, h0
-; CHECK-GI-NOFP16-NEXT:    add x8, x8, #8
-; CHECK-GI-NOFP16-NEXT:    cmp w8, #56
+; CHECK-GI-NOFP16-NEXT:    subs w8, w8, #1
 ; CHECK-GI-NOFP16-NEXT:    fcvtl v1.4s, v1.4h
 ; CHECK-GI-NOFP16-NEXT:    faddp v1.4s, v1.4s, v1.4s
 ; CHECK-GI-NOFP16-NEXT:    faddp s1, v1.2s
@@ -391,12 +387,11 @@ define half @fadd_reduction_v4f16_in_loop(ptr %ptr.start) {
 ; CHECK-GI-FP16-LABEL: fadd_reduction_v4f16_in_loop:
 ; CHECK-GI-FP16:       // %bb.0: // %entry
 ; CHECK-GI-FP16-NEXT:    movi d0, #0000000000000000
-; CHECK-GI-FP16-NEXT:    mov x8, xzr
+; CHECK-GI-FP16-NEXT:    mov w8, #7 // =0x7
 ; CHECK-GI-FP16-NEXT:  .LBB13_1: // %loop
 ; CHECK-GI-FP16-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-FP16-NEXT:    ldr d1, [x0, x8]
-; CHECK-GI-FP16-NEXT:    add x8, x8, #8
-; CHECK-GI-FP16-NEXT:    cmp w8, #56
+; CHECK-GI-FP16-NEXT:    ldr d1, [x0], #8
+; CHECK-GI-FP16-NEXT:    subs w8, w8, #1
 ; CHECK-GI-FP16-NEXT:    faddp v1.4h, v1.4h, v1.4h
 ; CHECK-GI-FP16-NEXT:    faddp h1, v1.2h
 ; CHECK-GI-FP16-NEXT:    fadd h0, h1, h0
@@ -428,13 +423,12 @@ define half @fadd_reduction_v8f16_in_loop(ptr %ptr.start) {
 ; CHECK-SD-NOFP16-LABEL: fadd_reduction_v8f16_in_loop:
 ; CHECK-SD-NOFP16:       // %bb.0: // %entry
 ; CHECK-SD-NOFP16-NEXT:    movi d0, #0000000000000000
-; CHECK-SD-NOFP16-NEXT:    mov x8, xzr
+; CHECK-SD-NOFP16-NEXT:    mov w8, #7 // =0x7
 ; CHECK-SD-NOFP16-NEXT:  .LBB14_1: // %loop
 ; CHECK-SD-NOFP16-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-NOFP16-NEXT:    ldr q1, [x0, x8]
+; CHECK-SD-NOFP16-NEXT:    ldr q1, [x0], #8
 ; CHECK-SD-NOFP16-NEXT:    fcvt s0, h0
-; CHECK-SD-NOFP16-NEXT:    add x8, x8, #8
-; CHECK-SD-NOFP16-NEXT:    cmp w8, #56
+; CHECK-SD-NOFP16-NEXT:    subs w8, w8, #1
 ; CHECK-SD-NOFP16-NEXT:    fcvtl2 v2.4s, v1.8h
 ; CHECK-SD-NOFP16-NEXT:    fcvtl v1.4s, v1.4h
 ; CHECK-SD-NOFP16-NEXT:    fadd v1.4s, v1.4s, v2.4s
@@ -451,12 +445,11 @@ define half @fadd_reduction_v8f16_in_loop(ptr %ptr.start) {
 ; CHECK-SD-FP16-LABEL: fadd_reduction_v8f16_in_loop:
 ; CHECK-SD-FP16:       // %bb.0: // %entry
 ; CHECK-SD-FP16-NEXT:    movi d0, #0000000000000000
-; CHECK-SD-FP16-NEXT:    mov x8, xzr
+; CHECK-SD-FP16-NEXT:    mov w8, #7 // =0x7
 ; CHECK-SD-FP16-NEXT:  .LBB14_1: // %loop
 ; CHECK-SD-FP16-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-SD-FP16-NEXT:    ldr q1, [x0, x8]
-; CHECK-SD-FP16-NEXT:    add x8, x8, #8
-; CHECK-SD-FP16-NEXT:    cmp w8, #56
+; CHECK-SD-FP16-NEXT:    ldr q1, [x0], #8
+; CHECK-SD-FP16-NEXT:    subs w8, w8, #1
 ; CHECK-SD-FP16-NEXT:    faddp v2.8h, v1.8h, v1.8h
 ; CHECK-SD-FP16-NEXT:    faddp v1.8h, v2.8h, v1.8h
 ; CHECK-SD-FP16-NEXT:    faddp h1, v1.2h
@@ -468,13 +461,12 @@ define half @fadd_reduction_v8f16_in_loop(ptr %ptr.start) {
 ; CHECK-GI-NOFP16-LABEL: fadd_reduction_v8f16_in_loop:
 ; CHECK-GI-NOFP16:       // %bb.0: // %entry
 ; CHECK-GI-NOFP16-NEXT:    movi d0, #0000000000000000
-; CHECK-GI-NOFP16-NEXT:    mov x8, xzr
+; CHECK-GI-NOFP16-NEXT:    mov w8, #7 // =0x7
 ; CHECK-GI-NOFP16-NEXT:  .LBB14_1: // %loop
 ; CHECK-GI-NOFP16-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-NOFP16-NEXT:    ldr q1, [x0, x8]
+; CHECK-GI-NOFP16-NEXT:    ldr q1, [x0], #8
 ; CHECK-GI-NOFP16-NEXT:    fcvt s0, h0
-; CHECK-GI-NOFP16-NEXT:    add x8, x8, #8
-; CHECK-GI-NOFP16-NEXT:    cmp w8, #56
+; CHECK-GI-NOFP16-NEXT:    subs w8, w8, #1
 ; CHECK-GI-NOFP16-NEXT:    fcvtl v2.4s, v1.4h
 ; CHECK-GI-NOFP16-NEXT:    fcvtl2 v1.4s, v1.8h
 ; CHECK-GI-NOFP16-NEXT:    fadd v1.4s, v2.4s, v1.4s
@@ -491,12 +483,11 @@ define half @fadd_reduction_v8f16_in_loop(ptr %ptr.start) {
 ; CHECK-GI-FP16-LABEL: fadd_reduction_v8f16_in_loop:
 ; CHECK-GI-FP16:       // %bb.0: // %entry
 ; CHECK-GI-FP16-NEXT:    movi d0, #0000000000000000
-; CHECK-GI-FP16-NEXT:    mov x8, xzr
+; CHECK-GI-FP16-NEXT:    mov w8, #7 // =0x7
 ; CHECK-GI-FP16-NEXT:  .LBB14_1: // %loop
 ; CHECK-GI-FP16-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-GI-FP16-NEXT:    ldr q1, [x0, x8]
-; CHECK-GI-FP16-NEXT:    add x8, x8, #8
-; CHECK-GI-FP16-NEXT:    cmp w8, #56
+; CHECK-GI-FP16-NEXT:    ldr q1, [x0], #8
+; CHECK-GI-FP16-NEXT:    subs w8, w8, #1
 ; CHECK-GI-FP16-NEXT:    faddp v2.8h, v1.8h, v1.8h
 ; CHECK-GI-FP16-NEXT:    faddp v1.8h, v2.8h, v1.8h
 ; CHECK-GI-FP16-NEXT:    faddp h1, v1.2h

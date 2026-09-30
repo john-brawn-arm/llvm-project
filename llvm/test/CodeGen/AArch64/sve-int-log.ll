@@ -678,29 +678,27 @@ define void @array_xor_not_v4i32(ptr %a, <4 x i32> %m) {
 ; SVE-LABEL: array_xor_not_v4i32:
 ; SVE:       // %bb.0: // %entry
 ; SVE-NEXT:    mvn v0.16b, v0.16b
-; SVE-NEXT:    mov x8, xzr
+; SVE-NEXT:    mov w8, #256 // =0x100
 ; SVE-NEXT:  .LBB45_1: // %for.body
 ; SVE-NEXT:    // =>This Inner Loop Header: Depth=1
-; SVE-NEXT:    ldr q1, [x0, x8]
+; SVE-NEXT:    ldr q1, [x0]
+; SVE-NEXT:    subs x8, x8, #1
 ; SVE-NEXT:    eor v1.16b, v1.16b, v0.16b
-; SVE-NEXT:    str q1, [x0, x8]
-; SVE-NEXT:    add x8, x8, #16
-; SVE-NEXT:    cmp x8, #1, lsl #12 // =4096
+; SVE-NEXT:    str q1, [x0], #16
 ; SVE-NEXT:    b.ne .LBB45_1
 ; SVE-NEXT:  // %bb.2: // %for.cond.cleanup
 ; SVE-NEXT:    ret
 ;
 ; SVE2-LABEL: array_xor_not_v4i32:
 ; SVE2:       // %bb.0: // %entry
-; SVE2-NEXT:    mov x8, xzr
+; SVE2-NEXT:    mov w8, #256 // =0x100
 ; SVE2-NEXT:    // kill: def $q0 killed $q0 def $z0
 ; SVE2-NEXT:  .LBB45_1: // %for.body
 ; SVE2-NEXT:    // =>This Inner Loop Header: Depth=1
-; SVE2-NEXT:    ldr q1, [x0, x8]
+; SVE2-NEXT:    ldr q1, [x0]
+; SVE2-NEXT:    subs x8, x8, #1
 ; SVE2-NEXT:    bsl2n z1.d, z1.d, z1.d, z0.d
-; SVE2-NEXT:    str q1, [x0, x8]
-; SVE2-NEXT:    add x8, x8, #16
-; SVE2-NEXT:    cmp x8, #1, lsl #12 // =4096
+; SVE2-NEXT:    str q1, [x0], #16
 ; SVE2-NEXT:    b.ne .LBB45_1
 ; SVE2-NEXT:  // %bb.2: // %for.cond.cleanup
 ; SVE2-NEXT:    ret

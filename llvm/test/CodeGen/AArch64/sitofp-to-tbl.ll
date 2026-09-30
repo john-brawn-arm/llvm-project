@@ -50,18 +50,16 @@ define void @sitofp_v8i8_to_v8f32(ptr %src, ptr %dst) {
 ; CHECK-NEXT:    adrp x9, .LCPI0_1
 ; CHECK-NEXT:    ldr q0, [x8, :lo12:.LCPI0_0]
 ; CHECK-NEXT:    ldr q1, [x9, :lo12:.LCPI0_1]
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1000 // =0x3e8
 ; CHECK-NEXT:  .LBB0_1: // %loop
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr d2, [x0, x8, lsl #3]
-; CHECK-NEXT:    add x9, x1, x8, lsl #5
-; CHECK-NEXT:    add x8, x8, #1
-; CHECK-NEXT:    cmp x8, #1000
+; CHECK-NEXT:    ldr d2, [x0], #8
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    tbl v3.16b, { v2.16b }, v0.16b
 ; CHECK-NEXT:    tbl v2.16b, { v2.16b }, v1.16b
 ; CHECK-NEXT:    scvtf v3.4s, v3.4s, #24
 ; CHECK-NEXT:    scvtf v2.4s, v2.4s, #24
-; CHECK-NEXT:    stp q2, q3, [x9]
+; CHECK-NEXT:    stp q2, q3, [x1], #32
 ; CHECK-NEXT:    b.ne .LBB0_1
 ; CHECK-NEXT:  // %bb.2: // %exit
 ; CHECK-NEXT:    ret
@@ -174,13 +172,11 @@ define void @sitofp_v16i8_to_v16f32(ptr %src, ptr %dst) {
 ; CHECK-NEXT:    ldr q1, [x9, :lo12:.LCPI1_1]
 ; CHECK-NEXT:    ldr q2, [x10, :lo12:.LCPI1_2]
 ; CHECK-NEXT:    ldr q3, [x8, :lo12:.LCPI1_3]
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1000 // =0x3e8
 ; CHECK-NEXT:  .LBB1_1: // %loop
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr q4, [x0, x8, lsl #4]
-; CHECK-NEXT:    add x9, x1, x8, lsl #6
-; CHECK-NEXT:    add x8, x8, #1
-; CHECK-NEXT:    cmp x8, #1000
+; CHECK-NEXT:    ldr q4, [x0], #16
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    tbl v5.16b, { v4.16b }, v0.16b
 ; CHECK-NEXT:    tbl v6.16b, { v4.16b }, v1.16b
 ; CHECK-NEXT:    tbl v7.16b, { v4.16b }, v2.16b
@@ -189,8 +185,8 @@ define void @sitofp_v16i8_to_v16f32(ptr %src, ptr %dst) {
 ; CHECK-NEXT:    scvtf v6.4s, v6.4s, #24
 ; CHECK-NEXT:    scvtf v7.4s, v7.4s, #24
 ; CHECK-NEXT:    scvtf v4.4s, v4.4s, #24
-; CHECK-NEXT:    stp q6, q5, [x9, #32]
-; CHECK-NEXT:    stp q4, q7, [x9]
+; CHECK-NEXT:    stp q6, q5, [x1, #32]
+; CHECK-NEXT:    stp q4, q7, [x1], #64
 ; CHECK-NEXT:    b.ne .LBB1_1
 ; CHECK-NEXT:  // %bb.2: // %exit
 ; CHECK-NEXT:    ret
@@ -217,10 +213,11 @@ exit:
 define void @sitofp_v8i8_to_v8f16(ptr %src, ptr %dst) {
 ; CHECK-LABEL: sitofp_v8i8_to_v8f16:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1000 // =0x3e8
 ; CHECK-NEXT:  .LBB2_1: // %loop
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr d0, [x0, x8, lsl #3]
+; CHECK-NEXT:    ldr d0, [x0], #8
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    sshll v0.8h, v0.8b, #0
 ; CHECK-NEXT:    sshll v1.4s, v0.4h, #0
 ; CHECK-NEXT:    sshll2 v0.4s, v0.8h, #0
@@ -228,9 +225,7 @@ define void @sitofp_v8i8_to_v8f16(ptr %src, ptr %dst) {
 ; CHECK-NEXT:    scvtf v0.4s, v0.4s
 ; CHECK-NEXT:    fcvtn v1.4h, v1.4s
 ; CHECK-NEXT:    fcvtn2 v1.8h, v0.4s
-; CHECK-NEXT:    str q1, [x1, x8, lsl #4]
-; CHECK-NEXT:    add x8, x8, #1
-; CHECK-NEXT:    cmp x8, #1000
+; CHECK-NEXT:    str q1, [x1], #16
 ; CHECK-NEXT:    b.ne .LBB2_1
 ; CHECK-NEXT:  // %bb.2: // %exit
 ; CHECK-NEXT:    ret
@@ -257,17 +252,16 @@ exit:
 define void @sitofp_v2i8_to_v2f64(ptr %src, ptr %dst) {
 ; CHECK-LABEL: sitofp_v2i8_to_v2f64:
 ; CHECK:       // %bb.0: // %entry
-; CHECK-NEXT:    mov x8, xzr
+; CHECK-NEXT:    mov w8, #1000 // =0x3e8
 ; CHECK-NEXT:  .LBB3_1: // %loop
 ; CHECK-NEXT:    // =>This Inner Loop Header: Depth=1
-; CHECK-NEXT:    ldr h0, [x0, x8, lsl #1]
+; CHECK-NEXT:    ldr h0, [x0], #2
+; CHECK-NEXT:    subs x8, x8, #1
 ; CHECK-NEXT:    sshll v0.8h, v0.8b, #0
 ; CHECK-NEXT:    sshll v0.4s, v0.4h, #0
 ; CHECK-NEXT:    sshll v0.2d, v0.2s, #0
 ; CHECK-NEXT:    scvtf v0.2d, v0.2d
-; CHECK-NEXT:    str q0, [x1, x8, lsl #4]
-; CHECK-NEXT:    add x8, x8, #1
-; CHECK-NEXT:    cmp x8, #1000
+; CHECK-NEXT:    str q0, [x1], #16
 ; CHECK-NEXT:    b.ne .LBB3_1
 ; CHECK-NEXT:  // %bb.2: // %exit
 ; CHECK-NEXT:    ret
